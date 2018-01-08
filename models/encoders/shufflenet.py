@@ -2,19 +2,17 @@ import tensorflow as tf
 from layers.convolution import shufflenet_unit, conv2d, max_pool_2d
 from utils.misc import load_obj, _debug
 import os
-
+import numpy as np
 
 class ShuffleNet:
     """ShuffleNet is implemented here!"""
 
-    # MEAN = [103.94, 116.78, 123.68]
-    MEAN = [73.29132098, 83.04442645, 72.5238962]
-
-    # NORMALIZER = 0.017
-
     def __init__(self, x_input, num_classes, pretrained_path, train_flag, batchnorm_enabled=True, num_groups=3,
-                 weight_decay=4e-5,
+                 weight_decay=4e-5, mean_path=None,
                  bias=0.0):
+        if mean_path is not None:
+            self.MEAN= np.load(mean_path)
+
         self.x_input = x_input
         self.train_flag = train_flag
         self.num_classes = num_classes
@@ -86,12 +84,14 @@ class ShuffleNet:
         print("Building the ShuffleNet..")
         with tf.variable_scope('shufflenet_encoder'):
             with tf.name_scope('Pre_Processing'):
-                red, green, blue = tf.split(self.x_input, num_or_size_splits=3, axis=3)
-                preprocessed_input = tf.concat([
-                    tf.subtract(blue, ShuffleNet.MEAN[0]) / tf.constant(255.0),
-                    tf.subtract(green, ShuffleNet.MEAN[1]) / tf.constant(255.0),
-                    tf.subtract(red, ShuffleNet.MEAN[2]) / tf.constant(255.0),
-                ], 3)
+#                red, green, blue = tf.split(self.x_input, num_or_size_splits=3, axis=3)
+                preprocessed_input = tf.subtract(self.x_input, self.MEAN) / tf.constant(255.0)
+
+#                tf.concat([
+#                    tf.subtract(blue, ShuffleNet.MEAN[0]) / tf.constant(255.0),
+#                    tf.subtract(green, ShuffleNet.MEAN[1]) / tf.constant(255.0),
+#                    tf.subtract(red, ShuffleNet.MEAN[2]) / tf.constant(255.0),
+#                ], 3)
             self.conv1 = conv2d('conv1', x=preprocessed_input, w=None, num_filters=self.output_channels['conv1'],
                                 kernel_size=(3, 3),
                                 stride=(2, 2), l2_strength=self.wd, bias=self.bias,

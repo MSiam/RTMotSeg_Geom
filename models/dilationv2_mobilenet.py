@@ -1,5 +1,4 @@
 from models.basic.basic_model import BasicModel
-from models.encoders.VGG import VGG16
 from models.encoders.mobilenet import MobileNet
 from layers.convolution import conv2d_transpose, conv2d, atrous_conv2d, depthwise_separable_conv2d
 import numpy as np

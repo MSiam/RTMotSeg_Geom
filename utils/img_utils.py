@@ -2,6 +2,9 @@ from PIL import Image
 import numpy as np
 
 # colour map
+label_colours_vivid = [(0, 0, 0),  # 'background'
+                        (255, 255, 255), ]  # foreground
+
 label_colours_global = [(128, 64, 128),  # 'road'
                         (244, 35, 232),  # 'sidewalk'
                         (70, 70, 70),  # 'building'
@@ -59,7 +62,8 @@ def decode_labels(mask, num_classes):
     """
 #    num_classes= num_classes+1
     # init colours array
-    colours = label_colours_global
+    #colours = label_colours_global
+    colours = label_colours_vivid
 
     # if num_classes == 7:
     #     colours = label_colours_scala_7

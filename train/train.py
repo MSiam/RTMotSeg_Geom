@@ -481,7 +481,7 @@ class Train(BasicTrain):
                     summaries_dict['train-loss-per-epoch'] = total_loss
                     summaries_dict['train-acc-per-epoch'] = total_acc
                     summaries_dict['train_prediction_sample'] = segmented_imgs
-                    #self.add_summary(cur_it, summaries_dict=summaries_dict, summaries_merged=summaries_merged)
+#                    self.add_summary(cur_it, summaries_dict=summaries_dict, summaries_merged=summaries_merged)
 
                     # report
                     self.reporter.report_experiment_statistics('train-acc', 'epoch-' + str(cur_epoch), str(total_acc))
@@ -702,7 +702,7 @@ class Train(BasicTrain):
 #                yy= decode_labels(y_batch, 20)
 #                cv2.imshow('before ', yy[0][:,:,::-1])
                 out_argmax[0] = self.linknet_postprocess(out_argmax[0])
-                segmented_imgs= decode_labels(out_argmax, 20)
+                segmented_imgs= decode_labels(out_argmax, self.args.num_classes)
 #                cv2.imshow('after ', yy2[0][:,:,::-1])
 #                cv2.waitKey()
 

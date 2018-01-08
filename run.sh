@@ -2,7 +2,6 @@
 
 ###################################### MobileNet ##################################################
 #1- FCN8s MobileNet Train Coarse+Fine
-#python3 main.py --load_config=fcn8s_mobilenet_traincoarse.yaml train Train FCN8sMobileNet
 #python3 main.py --load_config=fcn8s_mobilenet_train.yaml train Train FCN8sMobileNet
 
 #2- FCN8s MobileNet Test

@@ -1,5 +1,5 @@
 from layers.utils import *
-from layers.pooling import max_pool_2d
+from layers.pooling import max_pool_2d, avg_pool_2d
 import tensorflow as tf
 
 

@@ -8,7 +8,7 @@ import pdb
 from random import shuffle
 import h5py
 
-SIZE= (640, 480)
+SIZE= (480, 640)
 
 def write_image_annotation_pairs(filename_pairs, path, split):
     counter = 0
@@ -19,6 +19,8 @@ def write_image_annotation_pairs(filename_pairs, path, split):
         img = misc.imresize(img, SIZE)
         imgs.append(img)
         annotation = misc.imread(annotation_path)
+        annotation[annotation<=128]=0
+        annotation[annotation>128]=1
         annotation = misc.imresize(annotation, SIZE, 'nearest')
         labels.append(annotation)
 

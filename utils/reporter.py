@@ -22,26 +22,26 @@ class Reporter:
         self.report_dict['avg_inference_time_on_validation'] = {}
         self.report_dict['validation-mean-iou'] = {}
         self.report_dict['validation-total-mean-iou'] = {}
-        self.report_dict['validation-mean-iou']['road'] = {}
-        self.report_dict['validation-mean-iou']['sidewalk'] = {}
-        self.report_dict['validation-mean-iou']['building'] = {}
-        self.report_dict['validation-mean-iou']['wall'] = {}
-        self.report_dict['validation-mean-iou']['fence'] = {}
-        self.report_dict['validation-mean-iou']['pole'] = {}
-        self.report_dict['validation-mean-iou']['traffic light'] = {}
-        self.report_dict['validation-mean-iou']['traffic sign'] = {}
-        self.report_dict['validation-mean-iou']['vegetation'] = {}
-        self.report_dict['validation-mean-iou']['terrain'] = {}
-        self.report_dict['validation-mean-iou']['sky'] = {}
-        self.report_dict['validation-mean-iou']['person'] = {}
-        self.report_dict['validation-mean-iou']['rider'] = {}
-        self.report_dict['validation-mean-iou']['car'] = {}
-        self.report_dict['validation-mean-iou']['truck'] = {}
-        self.report_dict['validation-mean-iou']['bus'] = {}
-        self.report_dict['validation-mean-iou']['train'] = {}
-        self.report_dict['validation-mean-iou']['motorcycle'] = {}
-        self.report_dict['validation-mean-iou']['bicycle'] = {}
-        self.report_dict['validation-mean-iou']['ignore'] = {}
+#        self.report_dict['validation-mean-iou']['foreground'] = {}
+#        self.report_dict['validation-mean-iou']['background'] = {}
+#        self.report_dict['validation-mean-iou']['building'] = {}
+#        self.report_dict['validation-mean-iou']['wall'] = {}
+#        self.report_dict['validation-mean-iou']['fence'] = {}
+#        self.report_dict['validation-mean-iou']['pole'] = {}
+#        self.report_dict['validation-mean-iou']['traffic light'] = {}
+#        self.report_dict['validation-mean-iou']['traffic sign'] = {}
+#        self.report_dict['validation-mean-iou']['vegetation'] = {}
+#        self.report_dict['validation-mean-iou']['terrain'] = {}
+#        self.report_dict['validation-mean-iou']['sky'] = {}
+#        self.report_dict['validation-mean-iou']['person'] = {}
+#        self.report_dict['validation-mean-iou']['rider'] = {}
+#        self.report_dict['validation-mean-iou']['car'] = {}
+#        self.report_dict['validation-mean-iou']['truck'] = {}
+#        self.report_dict['validation-mean-iou']['bus'] = {}
+#        self.report_dict['validation-mean-iou']['train'] = {}
+#        self.report_dict['validation-mean-iou']['motorcycle'] = {}
+#        self.report_dict['validation-mean-iou']['bicycle'] = {}
+#        self.report_dict['validation-mean-iou']['ignore'] = {}
         # put the arguments of the report
         self.report_dict['arguments-of-the-experiment'] = {}
         for key, value in sorted(vars(args).items()):
@@ -59,25 +59,25 @@ class Reporter:
 
     def report_experiment_validation_iou(self, epoch, mean_iou, per_class_mean_iou):
         self.report_dict['validation-total-mean-iou'][epoch] = mean_iou
-        self.report_dict['validation-mean-iou']['road'][epoch] = str(per_class_mean_iou[0])
-        self.report_dict['validation-mean-iou']['sidewalk'][epoch] = str(per_class_mean_iou[1])
-        self.report_dict['validation-mean-iou']['building'][epoch] = str(per_class_mean_iou[2])
-        self.report_dict['validation-mean-iou']['wall'][epoch] = str(per_class_mean_iou[3])
-        self.report_dict['validation-mean-iou']['fence'][epoch] = str(per_class_mean_iou[4])
-        self.report_dict['validation-mean-iou']['pole'][epoch] = str(per_class_mean_iou[5])
-        self.report_dict['validation-mean-iou']['traffic light'][epoch] = str(per_class_mean_iou[6])
-        self.report_dict['validation-mean-iou']['traffic sign'][epoch] = str(per_class_mean_iou[7])
-        self.report_dict['validation-mean-iou']['vegetation'][epoch] = str(per_class_mean_iou[8])
-        self.report_dict['validation-mean-iou']['terrain'][epoch] = str(per_class_mean_iou[9])
-        self.report_dict['validation-mean-iou']['sky'][epoch] = str(per_class_mean_iou[10])
-        self.report_dict['validation-mean-iou']['person'][epoch] = str(per_class_mean_iou[11])
-        self.report_dict['validation-mean-iou']['rider'][epoch] = str(per_class_mean_iou[12])
-        self.report_dict['validation-mean-iou']['car'][epoch] = str(per_class_mean_iou[13])
-        self.report_dict['validation-mean-iou']['truck'][epoch] = str(per_class_mean_iou[14])
-        self.report_dict['validation-mean-iou']['bus'][epoch] = str(per_class_mean_iou[15])
-        self.report_dict['validation-mean-iou']['train'][epoch] = str(per_class_mean_iou[16])
-        self.report_dict['validation-mean-iou']['motorcycle'][epoch] = str(per_class_mean_iou[17])
-        self.report_dict['validation-mean-iou']['bicycle'][epoch] = str(per_class_mean_iou[18])
+#        self.report_dict['validation-mean-iou']['foreground'][epoch] = str(per_class_mean_iou[0])
+#        self.report_dict['validation-mean-iou']['background'][epoch] = str(per_class_mean_iou[1])
+#        self.report_dict['validation-mean-iou']['building'][epoch] = str(per_class_mean_iou[2])
+#        self.report_dict['validation-mean-iou']['wall'][epoch] = str(per_class_mean_iou[3])
+#        self.report_dict['validation-mean-iou']['fence'][epoch] = str(per_class_mean_iou[4])
+#        self.report_dict['validation-mean-iou']['pole'][epoch] = str(per_class_mean_iou[5])
+#        self.report_dict['validation-mean-iou']['traffic light'][epoch] = str(per_class_mean_iou[6])
+#        self.report_dict['validation-mean-iou']['traffic sign'][epoch] = str(per_class_mean_iou[7])
+#        self.report_dict['validation-mean-iou']['vegetation'][epoch] = str(per_class_mean_iou[8])
+#        self.report_dict['validation-mean-iou']['terrain'][epoch] = str(per_class_mean_iou[9])
+#        self.report_dict['validation-mean-iou']['sky'][epoch] = str(per_class_mean_iou[10])
+#        self.report_dict['validation-mean-iou']['person'][epoch] = str(per_class_mean_iou[11])
+#        self.report_dict['validation-mean-iou']['rider'][epoch] = str(per_class_mean_iou[12])
+#        self.report_dict['validation-mean-iou']['car'][epoch] = str(per_class_mean_iou[13])
+#        self.report_dict['validation-mean-iou']['truck'][epoch] = str(per_class_mean_iou[14])
+#        self.report_dict['validation-mean-iou']['bus'][epoch] = str(per_class_mean_iou[15])
+#        self.report_dict['validation-mean-iou']['train'][epoch] = str(per_class_mean_iou[16])
+#        self.report_dict['validation-mean-iou']['motorcycle'][epoch] = str(per_class_mean_iou[17])
+#        self.report_dict['validation-mean-iou']['bicycle'][epoch] = str(per_class_mean_iou[18])
 
 
 if __name__ == '__main__':

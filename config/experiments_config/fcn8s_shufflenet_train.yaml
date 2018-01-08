@@ -1,13 +1,13 @@
 # Directories arguments
-data_dir: "vivid"
+data_dir: "vivid_darpa"
 exp_dir:  "fcn8s_shufflenet"
 out_dir:  "fcn8s_shufflenet"
 
 # Data arguments
-img_height:   512
-img_width:    1024
+img_height:   480
+img_width:    640
 num_channels: 3
-num_classes:  20
+num_classes:  2
 
 # Train arguments
 num_epochs: 200
@@ -19,7 +19,7 @@ test_every: 10
 max_to_keep: 1
 weighted_loss: True
 random_cropping: False
-freeze_encoder: True
+freeze_encoder: False
 
 # Models arguments
 batchnorm_enabled: True
