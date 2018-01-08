@@ -172,9 +172,10 @@ class BasicModel:
                                                                preds_summary])  # Concatenate row-wise
 
         # Every step evaluate these summaries
-        with tf.name_scope('train-summary'):
-            tf.summary.scalar('loss', self.loss)
-            tf.summary.scalar('pixel_wise_accuracy', self.accuracy)
+        if self.loss is not None:
+            with tf.name_scope('train-summary'):
+                tf.summary.scalar('loss', self.loss)
+                tf.summary.scalar('pixel_wise_accuracy', self.accuracy)
 
         self.merged_summaries = tf.summary.merge_all()
 

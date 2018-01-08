@@ -60,8 +60,8 @@ class Agent:
             print('Building Test Network')
             with tf.variable_scope('network') as scope:
                 self.train_model = None
-                self.test_model = self.model(self.args, phase=2)
-                self.test_model.build()
+                self.model = self.model(self.args)
+                self.model.build()
                 calculate_flops()
 
     @timeit

@@ -58,10 +58,10 @@ class Metrics(object):
             self.fp= perclass_fp[1]
             self.fn= perclass_fn[1]
         self.iou= perclass_tp/(perclass_fp+ perclass_tp+ perclass_fn)
-        if nonignore is not None:
-            self.iou= self.iou[nonignore]
-        else:
-            self.iou= self.iou[:-1]
+        #if nonignore is not None:
+        #    self.iou= self.iou[nonignore]
+        #else:
+        #    self.iou= self.iou[:-1]
 
         self.mean_iou_index= self.getScoreAverage(self.iou)
 

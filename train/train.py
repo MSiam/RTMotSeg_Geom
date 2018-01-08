@@ -656,7 +656,6 @@ class Train(BasicTrain):
 
         # init tqdm and get the epoch value
         tt = tqdm(range(self.test_data_len))
-        naming = np.load(self.args.data_dir + 'names_train.npy')
 
         # init acc and loss lists
         acc_list = []
@@ -673,70 +672,32 @@ class Train(BasicTrain):
             # load mini_batches
             x_batch = self.test_data['X'][idx:idx + 1]
             y_batch = self.test_data['Y'][idx:idx + 1]
-
-            #print('mean images ', x_batch.mean())
-            #print('mean gt ', y_batch.mean())
-            # update idx of mini_batch
             idx += 1
 
             # Feed this variables to the network
-            if self.args.random_cropping:
-                feed_dict = {self.test_model.x_pl_before: x_batch,
-                             self.test_model.y_pl_before: y_batch,
-                             self.test_model.is_training: False,
-                             }
-            else:
-                feed_dict = {self.test_model.x_pl: x_batch,
-                             self.test_model.y_pl: y_batch,
-                             self.test_model.is_training: False
-                             }
+            feed_dict = {self.test_model.x_pl: x_batch,
+                         self.test_model.y_pl: y_batch,
+                         self.test_model.is_training: False
+                         }
 
             # run the feed_forward
-            out_argmax, acc, segmented_imgs = self.sess.run(
-                [self.test_model.out_argmax, self.test_model.accuracy,
-                 # self.test_model.merged_summaries, self.test_model.segmented_summary],
-                 self.test_model.segmented_summary],
+            out_argmax, segmented_imgs = self.sess.run([self.test_model.out_argmax,
+                self.test_model.segmented_summary],
                 feed_dict=feed_dict)
-
-            if pkl:
-#                yy= decode_labels(y_batch, 20)
-#                cv2.imshow('before ', yy[0][:,:,::-1])
-                out_argmax[0] = self.linknet_postprocess(out_argmax[0])
-                segmented_imgs= decode_labels(out_argmax, self.args.num_classes)
-#                cv2.imshow('after ', yy2[0][:,:,::-1])
-#                cv2.waitKey()
-
-
-#            cv2.imshow('result', segmented_imgs[0][:,:,::-1]);
-#            cv2.waitKey()
 
             #print('mean preds ', out_argmax.mean())
             # np.save(self.args.out_dir + 'npy/' + str(cur_iteration) + '.npy', out_argmax[0])
             plt.imsave(self.args.out_dir + 'imgs/' + 'test_' + str(cur_iteration) + '.png', segmented_imgs[0])
-
-            # log loss and acc
-            acc_list += [acc]
-
-            # log metrics
-            if self.args.random_cropping:
-                y1 = np.expand_dims(y_batch[0, :, :512], axis=0)
-                y2 = np.expand_dims(y_batch[0, :, 512:], axis=0)
-                y_batch = np.concatenate((y1, y2), axis=0)
-                self.metrics.update_metrics(out_argmax, y_batch, 0, 0)
-            else:
-                self.metrics.update_metrics(out_argmax[0], y_batch[0], 0, 0)
+            self.metrics.update_metrics(out_argmax[0], y_batch[0], 0, 0)
 
         # mean over batches
-        total_loss = 0
-        total_acc = np.mean(acc_list)
         mean_iou = self.metrics.compute_final_metrics(self.test_data_len)
 
         # print in console
         tt.close()
         print("Here the statistics")
-        print("Total_loss: " + str(total_loss))
-        print("Total_acc: " + str(total_acc)[:6])
         print("mean_iou: " + str(mean_iou))
+        print("foreground iou: " + str(self.metrics.iou[1]))
 
         print("Plotting imgs")
         for i in range(len(img_list)):
