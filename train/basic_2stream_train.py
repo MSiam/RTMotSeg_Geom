@@ -7,7 +7,7 @@ import pdb
 from utils.misc import timeit
 
 
-class BasicTrain(object):
+class Basic2StreamTrain(object):
     """
     A Base class for train classes of the models
     Contain all necessary functions for training
@@ -94,7 +94,8 @@ class BasicTrain(object):
 
         try:
             # This is for loading the pretrained weights if they can't be loaded during initialization.
-            model.encoder.load_pretrained_weights(self.sess)
+            model.app_encoder.load_pretrained_weights(self.sess)
+            model.mot_encoder.load_pretrained_weights(self.sess)
             print("Pretrained weights of the encoder is loaded")
         except AttributeError:
             pass

@@ -10,6 +10,42 @@ import h5py
 
 SIZE= (480, 640)
 
+def write_image_flow_annotation_pairs(filename_pairs, path, split):
+    counter = 0
+    imgs= []
+    labels= []
+    flows= []
+    for img_path, flow_path, annotation_path in tqdm(filename_pairs):
+        if not os.path.exists(flow_path):
+            print('file ', flow_path, ' doesnt exist ')
+            continue
+
+        flo = misc.imread(flow_path)
+        flo = misc.imresize(flo, SIZE)
+        flows.append(flo)
+        img = misc.imread(img_path)
+        img = misc.imresize(img, SIZE)
+        imgs.append(img)
+        annotation = misc.imread(annotation_path)
+        annotation[annotation<=128]=0
+        annotation[annotation>128]=1
+        annotation = misc.imresize(annotation, SIZE, 'nearest')
+        labels.append(annotation)
+
+    np.save(path+'/X_'+split+'.npy', imgs)
+    np.save(path+'/Flo_'+split+'.npy', flows)
+    np.save(path+'/Y_'+split+'.npy', labels)
+
+    if split=='train':
+        mean= np.mean(np.asarray(imgs), axis=0)
+        np.save(path+'/mean.npy', mean)
+
+        flo_mean= np.mean(np.asarray(flows), axis=0)
+        np.save(path+'/flo_mean.npy', flo_mean)
+
+        weights= get_weights(2, labels)
+        np.save(path+'/weights.npy', weights)
+
 def write_image_annotation_pairs(filename_pairs, path, split):
     counter = 0
     imgs= []
@@ -56,11 +92,21 @@ def parse_paths(args_):
     filename_pairs = []
 
     path_file = open(args.pathfile, 'r')
+    flow_flag= False
     for line in path_file:
         tkns= line.strip().split(' ')
-        filename_pairs.append((args_.root+tkns[0], args_.root+tkns[1]))
+        if len(tkns)==3:
+            flow_flag= True
+            filename_pairs.append((args_.root+tkns[0], args_.root+tkns[1], args_.root+tkns[2]))
+        else:
+            filename_pairs.append((args_.root+tkns[0], args_.root+tkns[1]))
+
     shuffle(filename_pairs)
-    write_image_annotation_pairs(filename_pairs, args_.out, args_.pathfile.split('_')[0])
+
+    if not flow_flag:
+        write_image_annotation_pairs(filename_pairs, args_.out, args_.pathfile.split('_')[0])
+    else:
+        write_image_flow_annotation_pairs(filename_pairs, args_.out, args_.pathfile.split('_')[0])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

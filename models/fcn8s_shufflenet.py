@@ -39,6 +39,7 @@ class FCN8sShuffleNet(BasicModel):
                                   batchnorm_enabled=self.args.batchnorm_enabled, num_groups=self.args.num_groups,
                                   weight_decay=self.args.weight_decay, bias=self.args.bias, mean_path= self.args.data_dir+'mean.npy')
 
+
         # Build Encoding part
         self.encoder.build()
 
