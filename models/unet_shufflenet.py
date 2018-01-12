@@ -6,8 +6,8 @@ import tensorflow as tf
 
 
 class UNetShuffleNet(BasicModel):
-    def __init__(self, args, phase=0):
-        super().__init__(args, phase=phase)
+    def __init__(self, args):
+        super().__init__(args)
         # init encoder
         self.encoder = None
 
@@ -34,7 +34,7 @@ class UNetShuffleNet(BasicModel):
         self.encoder = ShuffleNet(x_input=self.x_pl, num_classes=self.params.num_classes,
                                   pretrained_path=self.args.pretrained_path, train_flag=self.is_training,
                                   batchnorm_enabled=self.args.batchnorm_enabled, num_groups=self.args.num_groups,
-                                  weight_decay=self.args.weight_decay, bias=self.args.bias)
+                                  weight_decay=self.args.weight_decay, bias=self.args.bias, mean_path= self.args.data_dir+'mean.npy')
         # Build Encoding part
         self.encoder.build()
 

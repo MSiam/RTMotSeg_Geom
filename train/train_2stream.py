@@ -349,6 +349,7 @@ class Train2Stream(Basic2StreamTrain):
     def load_test_data(self):
         print("Loading Testing data..")
         self.test_data = {'X': np.load(self.args.data_dir + "X_val.npy"),
+                          'Flo': np.load(self.args.data_dir+ "Flo_val.npy"),
                           'Y': np.load(self.args.data_dir + "Y_val.npy")}
         self.test_data_len = self.test_data['X'].shape[0] - self.test_data['X'].shape[0] % self.args.batch_size
         print("Test-shape-x -- " + str(self.test_data['X'].shape))
