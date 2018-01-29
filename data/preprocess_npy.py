@@ -8,7 +8,7 @@ import pdb
 from random import shuffle
 import h5py
 
-SIZE= (480, 640)
+SIZE= (384, 1248)
 
 def write_image_flow_annotation_pairs(filename_pairs, path, split):
     counter = 0
@@ -101,7 +101,7 @@ def parse_paths(args_):
         else:
             filename_pairs.append((args_.root+tkns[0], args_.root+tkns[1]))
 
-    shuffle(filename_pairs)
+    #shuffle(filename_pairs)
 
     if not flow_flag:
         write_image_annotation_pairs(filename_pairs, args_.out, args_.pathfile.split('_')[0])

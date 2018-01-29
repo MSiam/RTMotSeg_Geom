@@ -28,7 +28,6 @@ def main(main_path, split, out_path):
 #            path_file.write(short_img_dir+imgs_folders[i]+'/'+labels_files[j]
 #                    +' '+short_label_dir+labels_folders[i]+'/'+labels_files[j]+'\n')
 
-
             fno= int(labels_files[j].split('frame')[1].split('.')[0])
             path_file.write(short_img_dir+imgs_folders[i]+'/'+labels_files[j]+' '+short_flow_dir+flow_folders[i]+'/'+'%06d.png'%fno
                     +' '+short_label_dir+labels_folders[i]+'/'+labels_files[j]+'\n')

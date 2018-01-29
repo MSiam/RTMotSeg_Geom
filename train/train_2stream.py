@@ -696,7 +696,7 @@ class Train2Stream(Basic2StreamTrain):
                 feed_dict=feed_dict)
 
             #print('mean preds ', out_argmax.mean())
-            # np.save(self.args.out_dir + 'npy/' + str(cur_iteration) + '.npy', out_argmax[0])
+            np.save(self.args.out_dir + 'npy/' + str(cur_iteration) + '.npy', out_argmax[0])
             plt.imsave(self.args.out_dir + 'imgs/' + 'test_' + str(cur_iteration) + '.png', segmented_imgs[0])
             self.metrics.update_metrics(out_argmax[0], y_batch[0], 0, 0)
 

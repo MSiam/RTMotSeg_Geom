@@ -1,11 +1,11 @@
 # Directories arguments
-data_dir: "vivid_2streamwarp_darpa"
-exp_dir:  "fcn8s_2streamwarp_shufflenet"
-out_dir:  "fcn8s_2streamwarp_shufflenet"
+data_dir: "kitti_2stream"
+exp_dir:  "fcn8s_2streamkitti_shufflenet"
+out_dir:  "fcn8s_2streakitti_shufflenet"
 
 # Data arguments
-img_height:   480
-img_width:    640
+img_height:   384
+img_width:    1248
 num_channels: 3
 num_classes:  2
 
