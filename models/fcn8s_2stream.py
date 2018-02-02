@@ -2,7 +2,7 @@ from models.basic.basic_model import BasicModel
 from models.encoders.VGG import VGG16
 from models.encoders.mobilenet import MobileNet
 from layers.convolution import conv2d_transpose, conv2d
-
+import numpy as np
 import tensorflow as tf
 from utils.misc import _debug
 import pdb
@@ -84,7 +84,7 @@ class FCN8s2Stream(BasicModel):
                              train_flag=self.is_training,
                              reduced_flag=False,
                              weight_decay=self.args.weight_decay, mean_path= self.args.data_dir+'mean.npy')
-        self.motion_encoder = VGG16(x_input=self.x_pl, prefix= 'mot_',
+        self.motion_encoder = VGG16(x_input=self.flo_pl, prefix= 'mot_',
                              num_classes=self.params.num_classes,
                              pretrained_path=self.args.pretrained_path,
                              train_flag=self.is_training,

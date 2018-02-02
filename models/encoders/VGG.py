@@ -29,7 +29,7 @@ class VGG16:
         """
         if mean_path is not None:
             self.MEAN= np.load(mean_path)
-
+        self.prefix= prefix
         # Load pretrained path
         self.pretrained_weights = np.load(pretrained_path, encoding='latin1').item()
         print('pretrained weights loaded')
@@ -83,12 +83,7 @@ class VGG16:
         # Convert RGB to BGR
         with tf.variable_scope(var_scope):
             with tf.name_scope('Pre_Processing'):
-                red, green, blue = tf.split(self.x_input, num_or_size_splits=3, axis=3)
-                preprocessed_input = tf.concat([
-                        tf.subtract(blue, self.MEAN[0]) / tf.constant(255.0),
-                        tf.subtract(green, self.MEAN[1]) / tf.constant(255.0),
-                        tf.subtract(red, self.MEAN[2]) / tf.constant(255.0),
-                    ], 3)
+                preprocessed_input = tf.subtract(self.x_input, self.MEAN) / tf.constant(255.0)
 
             self.conv1_1 = load_conv_layer(preprocessed_input, 'conv1_1', self.pretrained_weights, l2_strength=self.wd)
             _debug(self.conv1_1)
