@@ -5,7 +5,7 @@ from layers.convolution import conv2d_transpose, conv2d
 import numpy as np
 import tensorflow as tf
 from utils.misc import _debug
-import pdb
+from utils.img_utils import decode_labels
 
 class FCN8s2Stream(BasicModel):
     """
@@ -95,28 +95,40 @@ class FCN8s2Stream(BasicModel):
         self.app_encoder.build()
         self.motion_encoder.build()
         self.combined_score= tf.multiply(self.app_encoder.score_fr, self.motion_encoder.score_fr)
-        self.combined_feed1= tf.multiply(self.app_encoder.feed1, self.motion_encoder.feed1)
-        self.combined_feed2= tf.multiply(self.app_encoder.feed2, self.motion_encoder.feed2)
-
         # Build Decoding part
         with tf.name_scope('upscore_2s'):
             self.upscore2 = conv2d_transpose('upscore2', x=self.combined_score,
-                                             output_shape=self.combined_feed1.shape.as_list()[0:3] + [
+                                             output_shape=self.app_encoder.feed1.shape.as_list()[0:3] + [
                                                  self.params.num_classes], batchnorm_enabled=self.args.batchnorm_enabled,
                                              kernel_size=(4, 4), stride=(2, 2), l2_strength=self.app_encoder.wd, bias=self.args.bias)
-            self.score_feed1 = conv2d('score_feed1', x=self.combined_feed1, batchnorm_enabled=self.args.batchnorm_enabled,
+
+            self.app_score_feed1 = conv2d('app_score_feed1', x=self.app_encoder.feed1, batchnorm_enabled=self.args.batchnorm_enabled,
                                       num_filters=self.params.num_classes, kernel_size=(1, 1), bias= self.args.bias,
                                       l2_strength=self.app_encoder.wd)
+            self.app_score_feed1 = tf.nn.relu(self.app_score_feed1)
+            self.mot_score_feed1 = conv2d('mot_score_feed1', x=self.motion_encoder.feed1, batchnorm_enabled=self.args.batchnorm_enabled,
+                                      num_filters=self.params.num_classes, kernel_size=(1, 1), bias= self.args.bias,
+                                      l2_strength=self.motion_encoder.wd)
+            self.mot_score_feed1 = tf.nn.relu(self.mot_score_feed1)
+            self.score_feed1= tf.multiply(self.app_score_feed1, self.mot_score_feed1)
             self.fuse_feed1 = tf.add(self.score_feed1, self.upscore2)
 
         with tf.name_scope('upscore_4s'):
             self.upscore4 = conv2d_transpose('upscore4', x=self.fuse_feed1,
-                                             output_shape=self.combined_feed2.shape.as_list()[0:3] + [
+                                             output_shape=self.app_encoder.feed2.shape.as_list()[0:3] + [
                                                  self.params.num_classes], batchnorm_enabled=self.args.batchnorm_enabled,
                                              kernel_size=(4, 4), stride=(2, 2), l2_strength=self.app_encoder.wd, bias=self.args.bias)
-            self.score_feed2 = conv2d('score_feed2', x=self.combined_feed2, batchnorm_enabled=self.args.batchnorm_enabled,
+
+            self.app_score_feed2 = conv2d('app_score_feed2', x=self.app_encoder.feed2, batchnorm_enabled=self.args.batchnorm_enabled,
                                       num_filters=self.params.num_classes, kernel_size=(1, 1), bias=self.args.bias,
                                       l2_strength=self.app_encoder.wd)
+            self.app_score_feed2 = tf.nn.relu(self.app_score_feed2)
+            self.mot_score_feed2 = conv2d('mot_score_feed2', x=self.motion_encoder.feed2, batchnorm_enabled=self.args.batchnorm_enabled,
+                                      num_filters=self.params.num_classes, kernel_size=(1, 1), bias=self.args.bias,
+                                      l2_strength=self.motion_encoder.wd)
+            self.mot_score_feed2 = tf.nn.relu(self.mot_score_feed2)
+            self.score_feed2= tf.multiply(self.app_score_feed2, self.mot_score_feed2)
+
             self.fuse_feed2 = tf.add(self.score_feed2, self.upscore4)
 
         with tf.name_scope('upscore_8s'):
