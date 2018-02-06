@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 
-###################################### MobileNet ##################################################
-#1- FCN8s MobileNet Train Coarse+Fine
-#python3 main.py --load_config=fcn8s_mobilenet_train.yaml train Train FCN8sMobileNet
-python3 main.py --load_config=fcn8s_2stream_vgg16_train.yaml train Train2Stream FCN8s2Stream
+###################################### VGG16##################################################
+#python3 main.py --load_config=fcn8s_2stream_vgg16_train.yaml train Train2Stream FCN8s2Stream
+#python3 main.py --load_config=fcn8s_2stream_vgg16_test.yaml test Train2Stream FCN8s2Stream
 
-#2- FCN8s MobileNet Test
-#python3 main.py --load_config=fcn8s_mobilenet_test.yaml test Train FCN8sMobileNet
+python3 main.py --load_config=fcn8s_2stream_mobilenet_train.yaml train Train2Stream FCN8s2StreamMobileNet
 
 ###################################### ShuffleNet #################################################
 #1- FCN8s ShuffleNet Train Coarse+Fine

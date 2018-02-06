@@ -1,7 +1,7 @@
 # Directories arguments
-data_dir: "vivid_2streamwarp_darpa"
-exp_dir:  "fcn8s_2streamwarp_shufflenet"
-out_dir:  "fcn8s_2streamwarp_shufflenet"
+data_dir: "vivid_2stream_darpa"
+exp_dir:  "fcn8s_2stream_mobilenet"
+out_dir:  "fcn8s_2stream_mobilenet"
 
 # Data arguments
 img_height:   480
@@ -11,11 +11,11 @@ num_classes:  2
 
 # Train arguments
 num_epochs: 200
-batch_size: 1
+batch_size: 8
 shuffle: True
-data_mode: "test"
-save_every: 5
-test_every: 5
+data_mode: "experiment"
+save_every: 10
+test_every: 10
 max_to_keep: 1
 weighted_loss: True
 random_cropping: False
@@ -23,11 +23,10 @@ freeze_encoder: False
 
 # Models arguments
 batchnorm_enabled: True
-num_groups: 3
 learning_rate:   0.0001
 weight_decay: 5e-4
 bias: 0.0
-pretrained_path: "pretrained_weights/shufflenet_weights.pkl"
+pretrained_path: "pretrained_weights/mobilenet_v1.pkl"
 
 # Misc arguments
 verbose: False

@@ -14,8 +14,8 @@ num_epochs: 200
 batch_size: 8
 shuffle: True
 data_mode: "experiment"
-save_every: 10
-test_every: 10
+save_every: 5
+test_every: 5
 max_to_keep: 1
 weighted_loss: True
 random_cropping: False
