@@ -1,5 +1,5 @@
 # Directories arguments
-data_dir: "kitti_2stream"
+data_dir: "kitti_2stream_sms"
 exp_dir:  "fcn8s_2streamkitti_shufflenet"
 out_dir:  "fcn8s_2streakitti_shufflenet"
 
