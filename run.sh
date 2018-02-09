@@ -13,5 +13,5 @@
 
 #2- FCN8s ShuffleNet Test
 #python3 main.py --load_config=fcn8s_shufflenet_test.yaml inference Train FCN8sShuffleNet
-python3 main.py --load_config=fcn8s_2stream_shufflenet_test.yaml inference Train2Stream FCN8s2StreamShuffleNet2
+python3 main.py --load_config=fcn8s_2stream_shufflenet_test.yaml inference Train2Stream FCN8s2StreamShuffleNet
 #python3 main.py --load_config=fcn8s_shufflenet_test.yaml inference Train FCN8sShuffleNet

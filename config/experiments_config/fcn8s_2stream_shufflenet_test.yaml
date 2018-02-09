@@ -1,7 +1,7 @@
 # Directories arguments
-data_dir: "vivid_2streamwarp_darpa"
-exp_dir:  "fcn8s_2streamwarp_shufflenet"
-out_dir:  "fcn8s_2streamwarp_shufflenet"
+data_dir: "kitti_2stream_sms"
+exp_dir:  "fcn8s_2streamkittisms_shufflenet"
+out_dir:  "fcn8s_2streamkittisms_shufflenet"
 
 # Data arguments
 img_height:   384
