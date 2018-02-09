@@ -4,8 +4,8 @@ exp_dir:  "fcn8s_2streamwarp_shufflenet"
 out_dir:  "fcn8s_2streamwarp_shufflenet"
 
 # Data arguments
-img_height:   480
-img_width:    640
+img_height:   384
+img_width:    768
 num_channels: 3
 num_classes:  2
 

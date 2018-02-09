@@ -4,16 +4,19 @@ from utils.misc import load_obj, _debug
 import os
 import numpy as np
 import pdb
+import scipy
 
 class ShuffleNet:
     """ShuffleNet is implemented here!"""
 
     def __init__(self, x_input, num_classes, pretrained_path, train_flag, batchnorm_enabled=True, num_groups=3,
-                 weight_decay=4e-5, mean_path=None, prefix=None,
+                 weight_decay=4e-5, mean_path=None, prefix=None, size= None,
                  bias=0.0):
         if mean_path is not None:
             self.MEAN= np.load(mean_path)
-
+        if size is not None:
+            if self.MEAN.shape[:2] != size:
+                self.MEAN= scipy.misc.imresize(self.MEAN, size)
         self.x_input = x_input
         self.train_flag = train_flag
         self.num_classes = num_classes
