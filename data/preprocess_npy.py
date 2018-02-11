@@ -8,7 +8,9 @@ import pdb
 from random import shuffle
 import h5py
 
+#SIZE= (384, 1248)
 SIZE= (384, 1248)
+#SIZE= (512, 1024)
 
 def write_image_flow_annotation_pairs(filename_pairs, path, split):
     counter = 0
@@ -27,8 +29,14 @@ def write_image_flow_annotation_pairs(filename_pairs, path, split):
         img = misc.imresize(img, SIZE)
         imgs.append(img)
         annotation = misc.imread(annotation_path)
-        annotation[annotation<=128]=0
-        annotation[annotation>128]=1
+#        annotation[annotation==1]=0
+#        annotation[annotation==3]=0
+#        annotation[annotation==2]=1
+        annotation[annotation<=150]=0
+        annotation[annotation==255]=0
+        annotation[annotation>150]=1
+#        import matplotlib.pyplot as plt
+#        plt.imshow(annotation); plt.show()
         annotation = misc.imresize(annotation, SIZE, 'nearest')
         labels.append(annotation)
 
