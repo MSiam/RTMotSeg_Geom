@@ -2,23 +2,27 @@ import tensorflow as tf
 from layers.convolution import depthwise_separable_conv2d, conv2d
 import os
 from utils.misc import load_obj, save_obj
-
+import numpy as np
 
 class MobileNet:
     """
     MobileNet Class
     """
 
-#    MEAN = [103.939, 116.779, 123.68]
-    MEAN = [73.29132098,  83.04442645,  72.5238962]
     def __init__(self, x_input,
                  num_classes,
                  pretrained_path,
                  train_flag,
+                 prefix= None,
+                 mean_path= None,
                  width_multipler=1.0,
                  weight_decay=5e-4):
 
+        if mean_path is not None:
+            self.MEAN= np.load(mean_path)
+
         # init parameters and input
+        self.prefix= prefix
         self.x_input = x_input
         self.num_classes = num_classes
         self.train_flag = train_flag
@@ -62,15 +66,15 @@ class MobileNet:
         print("Layer_name: " + operation.op.name + " -Output_Shape: " + str(operation.shape.as_list()))
 
     def encoder_build(self):
+        if self.prefix is not None:
+            var_scope= self.prefix+'mobilenet_encoder'
+        else:
+            var_scope= 'mobilenet_encoder'
+
         print("Building the MobileNet..")
-        with tf.variable_scope('mobilenet_encoder'):
+        with tf.variable_scope(var_scope):
             with tf.name_scope('Pre_Processing'):
-                red, green, blue = tf.split(self.x_input, num_or_size_splits=3, axis=3)
-                preprocessed_input = tf.concat([
-                    (blue - MobileNet.MEAN[0]) / 255.0,
-                    (green - MobileNet.MEAN[1]) / 255.0,
-                    (red - MobileNet.MEAN[2]) / 255.0,
-                ], 3)
+                preprocessed_input = tf.subtract(self.x_input, self.MEAN) / tf.constant(255.0)
 
             self.conv1_1 = conv2d('conv_1', preprocessed_input, num_filters=int(round(32 * self.width_multiplier)),
                                   kernel_size=(3, 3),
