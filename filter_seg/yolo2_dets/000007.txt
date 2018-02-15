@@ -1,0 +1,3 @@
+Pedestrian 464 156 500 242
+Pedestrian 386 158 433 272
+Pedestrian 904 150 994 371
