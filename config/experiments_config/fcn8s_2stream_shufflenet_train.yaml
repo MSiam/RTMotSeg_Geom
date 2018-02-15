@@ -27,7 +27,7 @@ num_groups: 3
 learning_rate:   0.0001
 weight_decay: 5e-4
 bias: 0.0
-pretrained_path: "pretrained_weights/shufflenet_weights.pkl"
+pretrained_path: "pretrained_weights/shufflenet_cityscapes.pkl"
 
 # Misc arguments
 verbose: False

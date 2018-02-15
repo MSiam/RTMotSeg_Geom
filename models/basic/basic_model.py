@@ -147,10 +147,11 @@ class BasicModel:
             if self.params.weighted_loss:
                 self.cross_entropy_loss= self.weighted_loss()
             else:
-#                self.ce = tf.reduce_mean(
-#                    tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=self.y_pl))
-                self.ce = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=self.y_pl)
-                self.cross_entropy_loss = self.bootstrapped_ce_loss(self.ce, 0.25)
+                self.ce = tf.reduce_mean(
+                    tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=self.y_pl))
+#                self.ce = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.logits, labels=self.y_pl)
+#                self.cross_entropy_loss = self.bootstrapped_ce_loss(self.ce, 0.25)
+                self.cross_entropy_loss = self.ce
             self.regularization_loss = tf.reduce_sum(tf.get_collection(tf.GraphKeys.REGULARIZATION_LOSSES))
             self.loss = self.cross_entropy_loss + self.regularization_loss
 
