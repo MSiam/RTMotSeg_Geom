@@ -1,5 +1,5 @@
 # Directories arguments
-data_dir: "city_2stream_sms"
+data_dir: "citykitti_2stream_sms"
 exp_dir:  "fcn8s_2streamcitykitti_shufflenet"
 out_dir:  "fcn8s_2streamcitykitti_shufflenet"
 

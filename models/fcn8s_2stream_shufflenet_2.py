@@ -73,12 +73,12 @@ class FCN8s2StreamShuffleNet2(BasicModel):
 
         # Init ShuffleNet as an encoder
         self.app_encoder = ShuffleNet(x_input=self.x_pl, num_classes=self.params.num_classes, prefix='app_',
-                                  pretrained_path=self.args.pretrained_path, train_flag=self.is_training, size= (self.args.img_height,self.args.img_width),
+                                  pretrained_path=self.args.pretrained_path, train_flag=self.is_training,
                                   batchnorm_enabled=self.args.batchnorm_enabled, num_groups=self.args.num_groups,
                                   weight_decay=self.args.weight_decay, bias=self.args.bias, mean_path= self.args.data_dir+'mean.npy')
 
         self.motion_encoder = ShuffleNet(x_input=self.flo_pl, num_classes=self.params.num_classes, prefix='mot_',
-                                  pretrained_path=self.args.pretrained_path, train_flag=self.is_training, size= (self.args.img_height,self.args.img_width),
+                                  pretrained_path=self.args.pretrained_path, train_flag=self.is_training,
                                   batchnorm_enabled=self.args.batchnorm_enabled, num_groups=self.args.num_groups,
                                   weight_decay=self.args.weight_decay, bias=self.args.bias, mean_path= self.args.data_dir+'flo_mean.npy')
 
