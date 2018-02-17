@@ -32,9 +32,11 @@ def write_image_flow_annotation_pairs(filename_pairs, path, split):
 #        annotation[annotation==1]=0
 #        annotation[annotation==3]=0
 #        annotation[annotation==2]=1
-        annotation[annotation<=150]=0
-        annotation[annotation==255]=0
-        annotation[annotation>150]=1
+        annotation[annotation<128]=0
+        annotation[annotation>=128]=1
+#        annotation[annotation<=150]=0
+#        annotation[annotation==255]=0
+#        annotation[annotation>150]=1
 #        import matplotlib.pyplot as plt
 #        plt.imshow(annotation); plt.show()
         annotation = misc.imresize(annotation, SIZE, 'nearest')

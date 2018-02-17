@@ -9,5 +9,6 @@
 #python preprocess_npy.py --root=/home/eren/Data/KITTI_MOD_pre/ --pathfile=train_2stream_kittisms.txt --out=kitti_2stream_sms/
 #python preprocess_npy.py --root=/home/eren/Data/KITTI_MOD_pre/ --pathfile=val_2stream_kittisms.txt --out=kitti_2stream_sms/
 
-python preprocess_npy.py --root=/home/eren/Data/motion_data/ --pathfile=train_2stream_citysms.txt --out=city_2stream_sms/
+#python preprocess_npy.py --root=/home/eren/Data/motion_data/ --pathfile=train_2stream_citysms.txt --out=city_2stream_sms/
 #python preprocess_npy.py --root=/home/eren/Data/smsnet_test/kitti/ --pathfile=val_2stream_citysms.txt --out=city_2stream_sms/
+python preprocess_npy.py --root=/home/eren/Data/KITTI_MOD_pre/testing_2/ --pathfile=val_2stream_kittisq.txt --out=kitti_2stream_sq/
