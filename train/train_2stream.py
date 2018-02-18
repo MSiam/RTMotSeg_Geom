@@ -21,13 +21,14 @@ import scipy.misc as misc
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-#import cv2
 
 from utils.img_utils import decode_labels
 from utils.seg_dataloader import SegDataLoader
 from tensorflow.contrib.data import Iterator
 import pdb
 import torchfile
+from PIL import Image
+import cv2
 
 class Train2Stream(Basic2StreamTrain):
     """
@@ -345,12 +346,26 @@ class Train2Stream(Basic2StreamTrain):
         self.num_iterations_testing_per_epoch = (self.test_data_len + self.args.batch_size - 1) // self.args.batch_size
         print("Video data is loaded")
 
+    def resize(self, data):
+        X= []
+        Y= []
+        Flo= []
+        for i in range(data['X'].shape[0]):
+            X.append(misc.imresize(data['X'][i,...], (self.args.img_height, self.args.img_width)))
+            Y.append(misc.imresize(data['Y'][i,...], (self.args.img_height, self.args.img_width), 'nearest'))
+            Flo.append(misc.imresize(data['Flo'][i,...], (self.args.img_height, self.args.img_width)))
+        data['X']= np.asarray(X)
+        data['Y']= np.asarray(Y)
+        data['Flo']= np.asarray(Flo)
+        return data
+
     @timeit
     def load_test_data(self):
         print("Loading Testing data..")
         self.test_data = {'X': np.load(self.args.data_dir + "X_val.npy"),
                           'Flo': np.load(self.args.data_dir+ "Flo_val.npy"),
                           'Y': np.load(self.args.data_dir + "Y_val.npy")}
+        self.test_data= self.resize(self.test_data)
         self.test_data_len = self.test_data['X'].shape[0] - self.test_data['X'].shape[0] % self.args.batch_size
         print("Test-shape-x -- " + str(self.test_data['X'].shape))
         print("Test-shape-y -- " + str(self.test_data['Y'].shape))
@@ -859,3 +874,131 @@ class Train2Stream(Basic2StreamTrain):
         mean_iou = self.metrics.compute_final_metrics(1)
 
         print("mean_iou_of_debug: " + str(mean_iou))
+
+    def create_overlay(self, im, mask):
+        orig_shape = im.shape
+        im = Image.fromarray(im)
+        mask_g = np.zeros([mask.shape[0],mask.shape[1],3])
+        mask_g[:,:,1] = mask*255
+        overlay = Image.fromarray(np.uint8(mask_g))
+        overlay = overlay.convert("RGBA")
+        im = im.convert("RGBA")
+        im = Image.blend(im, overlay, 0.4)
+        return im
+
+    def drawVIVID(self, xbatch,flow,origFlow,out):
+        res = self.create_overlay(xbatch[0],out[0])
+        res = np.asarray(res)
+        res = np.expand_dims(res,0)
+        allzero = np.ones([1,xbatch.shape[1],xbatch.shape[2],1])*255
+        flow4d = np.concatenate([flow,allzero],axis=3)
+        origFlow4d = np.concatenate([origFlow,allzero],axis=3)
+        empty = np.zeros_like(res)
+        empty[:,:,:,-1] = 255
+        row1 = np.concatenate([res,empty],axis=2)
+        row2 = np.concatenate([flow4d,origFlow4d],axis=2)
+        img = np.concatenate([row1,row2],axis=1)
+        cv2.imshow('Jetson Challenge- Team MIA', np.uint8(img[0,...]))
+        cv2.waitKey(1)
+
+    def read_boxes(self):
+        all_boxes= []
+        for idx in range(371):
+            boxes= []
+            ff= open('/home/eren/Work/geomnet/data/kitti_2stream_sq/yolo2_output/2011_09_26_drive_0059_sync_%010d'%idx+'.txt', 'r')
+            for line in ff:
+                boxes.append(line)
+            all_boxes.append(boxes)
+        return all_boxes
+
+    def draw_boxes(self, img, boxes):
+        factor= 936.0/1248
+        colors= {'Car':(0,0,255), 'Pedestrian':(0,255,255), 'Van':(255,255,0), 'Truck':(0,0,0)}
+        for box in boxes:
+            box= box.strip().split()
+            cv2.rectangle(img, (int(factor*int(box[1])), int(factor*int(box[2]))), (int(factor*int(box[3])), int(factor*int(box[4]))),colors[box[0]], 2)
+#            cv2.putText(img, box[0], (int(factor*int(box[1]))-10, int(factor*int(box[2]))-10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,0,255))
+        return img
+
+    def compute_iou(self, mask, box, mask_temp):
+        if box[1]<0:
+            box[1]=0
+        if box[0]<0:
+            box[0]=0
+        if box[2]>mask.shape[1]:
+            box[2]= mask.shape[1]
+        if box[3]>mask.shape[0]:
+            box[3]= mask.shape[0]
+
+        bb= mask[box[1]:box[3], box[0]:box[2]]
+        intersection= len(bb[bb==1])
+        area= (box[2]-box[0])*(box[3]-box[1])
+        iou= float(intersection/area)
+        if iou>0.4:
+            mask_temp[box[1]:box[3], box[0]:box[2]]= bb
+        return mask_temp
+
+    def filter(self, out, boxes):
+        out_temp= np.zeros_like(out)
+        factor= 936.0/1248
+        for box in boxes:
+            box= box.strip().split()[1:]
+            box= [int(factor*int(b)) for b in box]
+            out_temp= self.compute_iou(out, box, out_temp)
+        return out_temp
+
+    def draw(self, xbatch,flow,out, boxes):
+        out= self.filter(out[0], boxes)
+        res = self.create_overlay(xbatch[0][:,:,::-1],out)
+        res = np.asarray(res)
+        res= self.draw_boxes(res, boxes)
+        res = np.expand_dims(res,0)
+        allzero = np.ones([1,xbatch.shape[1],xbatch.shape[2],1])*255
+        flow4d = np.concatenate([flow[:,:,:,::-1],allzero],axis=3)
+        img = np.concatenate([res,flow4d],axis=1)
+        cv2.imshow('Jetson Challenge- Team MIA', np.uint8(img[0,...]))
+        cv2.waitKey(1)
+
+    def test_optimized(self, pkl=False):
+        print("Testing mode will begin NOW..")
+
+        # load the best model checkpoint to test on it
+        if not pkl:
+            self.load_best_model()
+
+        # init tqdm and get the epoch value
+        tt = tqdm(range(self.test_data_len))
+
+        # init acc and loss lists
+        acc_list = []
+        img_list = []
+
+        # idx of image
+        idx = 0
+
+        # reset metrics
+        self.metrics.reset()
+        all_boxes= self.read_boxes()
+
+        # loop by the number of iterations
+        for cur_iteration in tt:
+            # load mini_batches
+            x_batch = self.test_data['X'][idx:idx + 1]
+            flo_batch = self.test_data['Flo'][idx:idx + 1]
+            #original_flo_batch = self.test_data['original_Flo'][idx:idx + 1]
+            y_batch = self.test_data['Y'][idx:idx + 1]
+            idx += 1
+
+            # run the feed_forward
+            out_argmax= self.sess.run(self.test_model.out_argmax)
+#            self.metrics.update_metrics(out_argmax[0], y_batch[0], 0, 0)
+            self.draw(x_batch, flo_batch, out_argmax, all_boxes[idx])
+        # mean over batches
+        mean_iou = self.metrics.compute_final_metrics(self.test_data_len)
+
+        # print in console
+        tt.close()
+        print("Here the statistics")
+        print("mean_iou: " + str(mean_iou))
+        print("foreground iou: " + str(self.metrics.iou[1]))
+

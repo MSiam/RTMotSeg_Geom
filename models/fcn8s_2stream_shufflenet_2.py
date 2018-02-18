@@ -18,10 +18,10 @@ class FCN8s2StreamShuffleNet2(BasicModel):
         self.encoder = None
         # init network layers
 
-    def build(self):
+    def build(self, x=None, flo=None):
         print("\nBuilding the MODEL...")
         self.init_input()
-        self.init_network()
+        self.init_network(x, flo)
         self.init_output()
         if self.args.data_mode=='experiment':
             self.init_train()
@@ -65,19 +65,27 @@ class FCN8s2StreamShuffleNet2(BasicModel):
         self.best_iou_input = tf.placeholder('float32', None, name='best_iou_input')
         self.best_iou_assign_op = self.best_iou_tensor.assign(self.best_iou_input)
 
-    def init_network(self):
+    def init_network(self, x=None, flo=None):
         """
         Building the Network here
         :return:
         """
+        print(x)
+        x_in = self.x_pl if x is None else x
+        flo_in = self.flo_pl if flo is None else flo
+
+#        import pdb; pdb.set_trace()
+        if x is not None:
+            self.is_training = False
+
 
         # Init ShuffleNet as an encoder
-        self.app_encoder = ShuffleNet(x_input=self.x_pl, num_classes=self.params.num_classes, prefix='app_',
+        self.app_encoder = ShuffleNet(x_input=x_in, num_classes=self.params.num_classes, prefix='app_',
                                   pretrained_path=self.args.pretrained_path, train_flag=self.is_training,
                                   batchnorm_enabled=self.args.batchnorm_enabled, num_groups=self.args.num_groups,
                                   weight_decay=self.args.weight_decay, bias=self.args.bias, mean_path= self.args.data_dir+'mean.npy')
 
-        self.motion_encoder = ShuffleNet(x_input=self.flo_pl, num_classes=self.params.num_classes, prefix='mot_',
+        self.motion_encoder = ShuffleNet(x_input=flo_in, num_classes=self.params.num_classes, prefix='mot_',
                                   pretrained_path=self.args.pretrained_path, train_flag=self.is_training,
                                   batchnorm_enabled=self.args.batchnorm_enabled, num_groups=self.args.num_groups,
                                   weight_decay=self.args.weight_decay, bias=self.args.bias, mean_path= self.args.data_dir+'flo_mean.npy')
@@ -91,10 +99,11 @@ class FCN8s2StreamShuffleNet2(BasicModel):
         self.combined_feed2= tf.multiply(self.app_encoder.feed2, self.motion_encoder.feed2)
 
 
+
         # Build Decoding part
         with tf.name_scope('upscore_2s'):
             self.upscore2 = conv2d_transpose('upscore2', x=self.combined_score,
-                                             output_shape=self.combined_feed1.shape.as_list()[0:3] + [
+                                             output_shape=[self.args.batch_size] + self.combined_feed1.shape.as_list()[1:3] + [
                                                  self.params.num_classes], batchnorm_enabled=self.args.batchnorm_enabled,
                                              kernel_size=(4, 4), stride=(2, 2), l2_strength=self.app_encoder.wd, bias=self.args.bias)
             currvars= get_vars_underscope(tf.get_variable_scope().name, 'upscore2')
@@ -113,7 +122,7 @@ class FCN8s2StreamShuffleNet2(BasicModel):
 
         with tf.name_scope('upscore_4s'):
             self.upscore4 = conv2d_transpose('upscore4', x=self.fuse_feed1,
-                                             output_shape=self.combined_feed2.shape.as_list()[0:3] + [
+                                             output_shape= [self.args.batch_size] +self.combined_feed2.shape.as_list()[1:3] + [
                                                  self.params.num_classes], batchnorm_enabled=self.args.batchnorm_enabled,
                                              kernel_size=(4, 4), stride=(2, 2), l2_strength=self.app_encoder.wd, bias=self.args.bias)
             currvars= get_vars_underscope(tf.get_variable_scope().name, 'upscore4')
@@ -131,7 +140,7 @@ class FCN8s2StreamShuffleNet2(BasicModel):
 
         with tf.name_scope('upscore_8s'):
             self.upscore8 = conv2d_transpose('upscore8', x=self.fuse_feed2,
-                                             output_shape=self.x_pl.shape.as_list()[0:3] + [self.params.num_classes],
+                                             output_shape=[self.args.batch_size] +self.x_pl.shape.as_list()[1:3] + [self.params.num_classes],
                                              kernel_size=(16, 16), stride=(8, 8), l2_strength=self.app_encoder.wd, bias=self.args.bias)
             currvars= get_vars_underscope(tf.get_variable_scope().name, 'upscore8')
             for v in currvars:

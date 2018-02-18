@@ -10,7 +10,7 @@ from test import *
 from utils.misc import timeit
 
 import os
-import pdb
+#import pdb
 import pickle
 from utils.misc import calculate_flops
 
@@ -39,30 +39,29 @@ class Agent:
         self.sess = None
 
     @timeit
-    def build_model(self):
-
+    def build_model(self, x_in=None, flow_in=None):
         if self.mode == 'train' or self.mode == 'overfit':  # validation phase
             with tf.variable_scope('network') as scope:
                 self.model = self.model(self.args)
                 self.model.build()
 
-#            print('Building Train Network')
-#            with tf.variable_scope('network') as scope:
-#                self.train_model = self.model(self.args, phase=0)
-#                self.train_model.build()
-#
-#            print('Building Test Network')
-#            with tf.variable_scope('network') as scope:
-#                scope.reuse_variables()
-#                self.test_model = self.model(self.args, phase=1)
-#                self.test_model.build()
+            #            print('Building Train Network')
+            #            with tf.variable_scope('network') as scope:
+            #                self.train_model = self.model(self.args, phase=0)
+            #                self.train_model.build()
+            #
+            #            print('Building Test Network')
+            #            with tf.variable_scope('network') as scope:
+            #                scope.reuse_variables()
+            #                self.test_model = self.model(self.args, phase=1)
+            #                self.test_model.build()
         else:  # inference phase
             print('Building Test Network')
             with tf.variable_scope('network') as scope:
                 self.train_model = None
                 self.model = self.model(self.args)
-                self.model.build()
-                calculate_flops()
+                self.model.build(x_in, flow_in)
+                # calculate_flops()
 
     @timeit
     def run(self):
@@ -81,8 +80,16 @@ class Agent:
         self.sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True))
 
         # Create Model class and build it
-        with self.sess.as_default():
-            self.build_model()
+        if self.mode == 'test_opt':
+            x_in, flow_in = self.optimized_data_loader()
+
+        # Create Model class and build it
+        if self.mode != 'test_opt':
+            with self.sess.as_default():
+                self.build_model()
+        else:
+            with self.sess.as_default():
+                self.build_model(x_in, flow_in)
 
         # Create the operator
         self.operator = self.operator(self.args, self.sess, self.model, self.model)
@@ -105,6 +112,8 @@ class Agent:
             self.debug()
         elif self.mode == 'test':
             self.test()
+        elif self.mode == 'test_opt':
+            self.inference(True)
         else:
             print("This mode {{{}}}  is not found in our framework".format(self.mode))
             exit(-1)
@@ -153,15 +162,66 @@ class Agent:
         except KeyboardInterrupt:
             self.operator.finalize()
 
-    def inference(self):
-        try:
-            self.operator.test_inference()
-        except KeyboardInterrupt:
-            pass
-
     def debug(self):
         self.load_pretrained_weights(self.sess, 'pretrained_weights/linknet_weights.pkl')
         try:
             self.operator.debug_layers()
         except KeyboardInterrupt:
             pass
+
+    def inference(self, opt=False):
+        try:
+            if opt:
+                self.operator.test_optimized()
+            else:
+                self.operator.test_inference()
+        except KeyboardInterrupt:
+            pass
+
+    def optimized_data_loader(self):
+        import numpy as np
+        import scipy.misc
+        with tf.device('/cpu:0'):
+            self.data_x = np.load(self.args.data_dir + "X_val.npy")
+            self.flow_x = np.load(self.args.data_dir + "Flo_val.npy")
+
+            self.data_x_new = np.zeros((self.data_x.shape[0], self.args.img_height, self.args.img_width, 3),
+                                       dtype=np.uint8)
+            for i in range(self.data_x.shape[0]):
+                self.data_x_new[i] = scipy.misc.imresize(self.data_x[i], (self.args.img_height, self.args.img_width))
+            self.flow_x_new = np.zeros((self.flow_x.shape[0], self.args.img_height, self.args.img_width, 3),
+                                       dtype=np.uint8)
+            for i in range(self.flow_x.shape[0]):
+                self.flow_x_new[i] = scipy.misc.imresize(self.flow_x[i], (self.args.img_height, self.args.img_width))
+
+            self.data_x = self.data_x_new
+            self.flow_x = self.flow_x_new
+
+            print(self.data_x.shape)
+            print(self.data_x.dtype)
+            print("DATA ITERATOR HERE!!")
+
+            self.features_placeholder = tf.placeholder(tf.float32, self.data_x.shape)
+            self.flow_placeholder = tf.placeholder(tf.float32, self.flow_x.shape)
+
+            dataset = tf.contrib.data.Dataset.from_tensor_slices(self.features_placeholder)
+            dataset2 = tf.contrib.data.Dataset.from_tensor_slices(self.flow_placeholder)
+
+            dataset = dataset.batch(self.args.batch_size)
+            dataset2 = dataset2.batch(self.args.batch_size)
+
+            self.iterator = tf.contrib.data.Iterator.from_structure(dataset.output_types,
+                                                            dataset.output_shapes)
+            self.iterator2 = tf.contrib.data.Iterator.from_structure(dataset2.output_types,
+                                                            dataset2.output_shapes)
+ 
+            self.next_batch = self.iterator.get_next()
+            self.next_batch_flow = self.iterator2.get_next()
+
+            self.training_init_op = self.iterator.make_initializer(dataset)
+            self.training_init_op2 = self.iterator2.make_initializer(dataset2)
+
+            self.sess.run(self.training_init_op, feed_dict={self.features_placeholder: self.data_x})
+            self.sess.run(self.training_init_op2, feed_dict={self.flow_placeholder: self.flow_x})
+
+        return self.next_batch, self.next_batch_flow
