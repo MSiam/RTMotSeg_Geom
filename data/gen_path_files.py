@@ -18,8 +18,8 @@ def main(main_path, split, out_path):
     short_img_dir= 'images/'
     label_dir= main_path+'/mask/'
     short_label_dir= 'mask/'
-    flow_dir= main_path+'/flow/'
-    short_flow_dir= 'flow/'
+    flow_dir= main_path+'/efs_flow/'
+    short_flow_dir= 'efs_flow/'
 
 #    for folder in os.listdir(img_dir):
     imgs_files= sorted(os.listdir(img_dir))

@@ -18,6 +18,7 @@ import pickle
 from utils.augmentation import flip_randomly_left_right_image_with_annotation, \
     scale_randomly_image_with_annotation_with_fixed_size_output
 import scipy.misc as misc
+from PIL import Image
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -350,6 +351,7 @@ class Train2Stream(Basic2StreamTrain):
         print("Loading Testing data..")
         self.test_data = {'X': np.load(self.args.data_dir + "X_val.npy"),
                           'Flo': np.load(self.args.data_dir+ "Flo_val.npy"),
+        #                  'original_Flo': np.load(self.args.data_dir+ "original_Flo_val.npy"),
                           'Y': np.load(self.args.data_dir + "Y_val.npy")}
         self.test_data_len = self.test_data['X'].shape[0] - self.test_data['X'].shape[0] % self.args.batch_size
         print("Test-shape-x -- " + str(self.test_data['X'].shape))
@@ -655,6 +657,18 @@ class Train2Stream(Basic2StreamTrain):
         gt2[gt == -1] = 19
         return gt2
 
+    def create_overlay(self, im, mask):
+        orig_shape = im.shape
+        im = Image.fromarray(im)
+        mask_g = np.zeros([mask.shape[0],mask.shape[1],3])
+        mask_g[:,:,1] = mask*255
+        overlay = Image.fromarray(np.uint8(mask_g))
+        overlay = overlay.convert("RGBA")
+        im = im.convert("RGBA")
+        im = Image.blend(im, overlay, 0.4)
+        return im
+
+
     def test(self, pkl=False):
         print("Testing mode will begin NOW..")
 
@@ -680,6 +694,7 @@ class Train2Stream(Basic2StreamTrain):
             # load mini_batches
             x_batch = self.test_data['X'][idx:idx + 1]
             flo_batch = self.test_data['Flo'][idx:idx + 1]
+#            original_flo_batch = self.test_data['original_Flo'][idx:idx + 1]
             y_batch = self.test_data['Y'][idx:idx + 1]
             idx += 1
 
@@ -697,7 +712,13 @@ class Train2Stream(Basic2StreamTrain):
 
             #print('mean preds ', out_argmax.mean())
             np.save(self.args.out_dir + 'npy/' + str(cur_iteration) + '.npy', out_argmax[0])
-            plt.imsave(self.args.out_dir + 'imgs/' + 'test_' + str(cur_iteration) + '.png', segmented_imgs[0])
+#            plt.imsave(self.args.out_dir + 'imgs/' + 'test_' + str(cur_iteration) + '.png', segmented_imgs[0])
+#            plt.imsave(self.args.out_dir + 'imgs/' + 'test_' + str(cur_iteration) + '.png', x_batch[0])
+#            plt.imsave(self.args.out_dir + 'warp_flos/' + 'test_' + str(cur_iteration) + '.png', flo_batch[0])
+#            plt.imsave(self.args.out_dir + 'flos/' + 'test_' + str(cur_iteration) + '.png', original_flo_batch[0])
+#            res = self.create_overlay(x_batch[0],out_argmax[0])
+#            plt.imsave(self.args.out_dir + 'outs/' + 'test_' + str(cur_iteration) + '.png', out_argmax[0])
+
             self.metrics.update_metrics(out_argmax[0], y_batch[0], 0, 0)
 
         # mean over batches

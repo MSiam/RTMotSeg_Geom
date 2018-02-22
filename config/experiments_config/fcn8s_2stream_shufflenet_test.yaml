@@ -3,6 +3,9 @@
 data_dir: "kitti_2stream_sq"
 exp_dir:  "fcn8s_2streamcitykitti_shufflenet_2"
 out_dir:  "fcn8s_2streamcitykitti_shufflenet_sq"
+#data_dir: "vivid_2streamwarp_darpa"
+#exp_dir:  "fcn8s_2streamwarp_shufflenet"
+#out_dir:  "fcn8s_2streamwarp_shufflenet"
 
 # Data arguments
 img_height:   384
