@@ -1,7 +1,7 @@
 # Directories arguments
-data_dir: "city_2stream_sms"
-exp_dir:  "fcn8s_2streamcity_mobilenet"
-out_dir:  "fcn8s_2streamcity_mobilenet"
+data_dir: "citykitti_2stream_sms"
+exp_dir:  "fcn8s_2streamcitykitti_mobilenet"
+out_dir:  "fcn8s_2streamcitykitti_mobilenet"
 
 # Data arguments
 img_height:   384
