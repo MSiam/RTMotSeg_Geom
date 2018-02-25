@@ -1,7 +1,7 @@
 # Directories arguments
-#data_dir: "citykitti_2stream_sms_mine"
+#data_dir: "citykitti_2stream_sms"
 data_dir: "kitti_2stream_sq_4"
-exp_dir:  "fcn8s_2streamcitykitti_shufflenet_3"
+exp_dir:  "fcn8s_2streamcitykitti_shufflenet_earlyfusion"
 out_dir:  "fcn8s_2streamcitykitti_shufflenet_sq_4"
 #data_dir: "vivid_2streamwarp_darpa"
 #exp_dir:  "fcn8s_2streamwarp_shufflenet"
@@ -9,7 +9,7 @@ out_dir:  "fcn8s_2streamcitykitti_shufflenet_sq_4"
 
 # Data arguments
 img_height:   384
-img_width:    1248
+img_width:    768 #1248
 num_channels: 3
 num_classes:  2
 

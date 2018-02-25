@@ -86,12 +86,11 @@ class FCN8s2StreamShuffleNet3(BasicModel):
         # Build Encoding part
         self.app_encoder.build()
         self.motion_encoder.build()
-#        self.combined_score= tf.multiply(self.app_encoder.stage2, self.motion_encoder.stage2)
-        self.combined_score= tf.concat((self.app_encoder.stage2, self.motion_encoder.stage2), axis=3)
-        _debug(self.combined_score)
-
-        self.combined_score = conv2d('combined_score', self.combined_score, num_filters= 240, l2_strength=self.args.weight_decay,
-                               kernel_size=(1, 1))
+        self.combined_score= tf.multiply(self.app_encoder.stage2, self.motion_encoder.stage2)
+#        self.combined_score= tf.concat((self.app_encoder.stage2, self.motion_encoder.stage2), axis=3)
+#        _debug(self.combined_score)
+#        self.combined_score = conv2d('combined_score', self.combined_score, num_filters= 240, l2_strength=self.args.weight_decay,
+#                               kernel_size=(1, 1))
 
         self.stage3 = self.app_encoder.stage(self.combined_score, stage=3, repeat=7)
         _debug(self.stage3)
