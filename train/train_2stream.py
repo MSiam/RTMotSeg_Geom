@@ -346,6 +346,19 @@ class Train2Stream(Basic2StreamTrain):
         self.num_iterations_testing_per_epoch = (self.test_data_len + self.args.batch_size - 1) // self.args.batch_size
         print("Video data is loaded")
 
+    def resize(self, data):
+        X= []
+        Y= []
+        Flo= []
+        for i in range(data['X'].shape[0]):
+            X.append(misc.imresize(data['X'][i,...], (self.args.img_height, self.args.img_width)))
+            Y.append(misc.imresize(data['Y'][i,...], (self.args.img_height, self.args.img_width), 'nearest'))
+            Flo.append(misc.imresize(data['Flo'][i,...], (self.args.img_height, self.args.img_width)))
+        data['X']= np.asarray(X)
+        data['Y']= np.asarray(Y)
+        data['Flo']= np.asarray(Flo)
+        return data
+
     @timeit
     def load_test_data(self):
         print("Loading Testing data..")
@@ -353,6 +366,7 @@ class Train2Stream(Basic2StreamTrain):
                           'Flo': np.load(self.args.data_dir+ "Flo_val.npy"),
         #                  'original_Flo': np.load(self.args.data_dir+ "original_Flo_val.npy"),
                           'Y': np.load(self.args.data_dir + "Y_val.npy")}
+        self.test_data= self.resize(self.test_data)
         self.test_data_len = self.test_data['X'].shape[0] - self.test_data['X'].shape[0] % self.args.batch_size
         print("Test-shape-x -- " + str(self.test_data['X'].shape))
         print("Test-shape-y -- " + str(self.test_data['Y'].shape))
