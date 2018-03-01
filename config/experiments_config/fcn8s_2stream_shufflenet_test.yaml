@@ -1,12 +1,12 @@
 # Directories arguments
 #data_dir: "citykitti_2stream_sms"
 data_dir: "kitti_2stream_sq"
-exp_dir:  "fcn8s_2streamcitykitti_shufflenet_2"
+exp_dir:  "fcn8s_2streamcitykitti_shufflenet_3"
 out_dir:  "fcn8s_2streamcitykitti_shufflenet_sq"
 
 # Data arguments
-img_height:  288 #192 #384
-img_width:   936 #624  #1248
+img_height:  384 #384
+img_width:   768 #624  #1248
 num_channels: 3
 num_classes:  2
 

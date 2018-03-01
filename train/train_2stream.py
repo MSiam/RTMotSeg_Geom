@@ -959,6 +959,42 @@ class Train2Stream(Basic2StreamTrain):
         cv2.imshow('Jetson Challenge- Team MIA', np.uint8(img[0,...]))
         cv2.waitKey(1)
 
+    def test_inference_optimized(self):
+        print("INFERENCE mode will begin NOW..")
+
+        # load the best model checkpoint to test on it
+        self.load_best_model()
+
+        # init tqdm and get the epoch value
+        tt = tqdm(range(self.test_data_len))
+
+        # idx of image
+        idx = 0
+
+        # create the FPS Meter
+        fps_meter = FPSMeter()
+
+        # loop by the number of iterations
+        for cur in tt:
+            # update idx of mini_batch
+            idx += self.args.batch_size
+
+            # calculate the time of one inference
+            start = time.time()
+
+            try:
+                # run the feed_forward
+                _ = self.sess.run(self.test_model.out_argmax)
+                # update the FPS meter
+                fps_meter.update_n(time.time() - start, self.args.batch_size)
+
+            except Exception as e:
+                print("FINISHED..")
+                print(e)
+                break
+
+        fps_meter.print_statistics()
+ 
     def test_optimized(self, pkl=False):
         print("Testing mode will begin NOW..")
 
@@ -978,7 +1014,7 @@ class Train2Stream(Basic2StreamTrain):
 
         # reset metrics
         self.metrics.reset()
-        all_boxes= self.read_boxes()
+#        all_boxes= self.read_boxes()
 
         # loop by the number of iterations
         for cur_iteration in tt:
@@ -992,7 +1028,7 @@ class Train2Stream(Basic2StreamTrain):
             # run the feed_forward
             out_argmax= self.sess.run(self.test_model.out_argmax)
 #            self.metrics.update_metrics(out_argmax[0], y_batch[0], 0, 0)
-            self.draw(x_batch, flo_batch, out_argmax, all_boxes[idx])
+#            self.draw(x_batch, flo_batch, out_argmax, all_boxes[idx])
         # mean over batches
         mean_iou = self.metrics.compute_final_metrics(self.test_data_len)
 

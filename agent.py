@@ -84,7 +84,7 @@ class Agent:
             x_in, flow_in = self.optimized_data_loader()
 
         # Create Model class and build it
-        if self.mode != 'test_opt':
+        if self.mode != 'test_opt' and self.mode!='inference_opt':
             with self.sess.as_default():
                 self.build_model()
         else:
@@ -113,6 +113,8 @@ class Agent:
         elif self.mode == 'test':
             self.test()
         elif self.mode == 'test_opt':
+            self.inference(True)
+        elif self.mode == 'inference_opt':
             self.inference(True)
         else:
             print("This mode {{{}}}  is not found in our framework".format(self.mode))
@@ -172,7 +174,7 @@ class Agent:
     def inference(self, opt=False):
         try:
             if opt:
-                self.operator.test_optimized()
+                self.operator.test_inference_optimized()
             else:
                 self.operator.test_inference()
         except KeyboardInterrupt:
@@ -223,5 +225,4 @@ class Agent:
 
             self.sess.run(self.training_init_op, feed_dict={self.features_placeholder: self.data_x})
             self.sess.run(self.training_init_op2, feed_dict={self.flow_placeholder: self.flow_x})
-
         return self.next_batch, self.next_batch_flow
