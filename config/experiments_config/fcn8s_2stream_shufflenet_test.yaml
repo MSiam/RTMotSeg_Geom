@@ -1,6 +1,6 @@
 # Directories arguments
 #data_dir: "citykitti_2stream_sms"
-data_dir: "kitti_2stream_sq"
+data_dir: "kitti_2stream_sq_3"
 exp_dir:  "fcn8s_2streamcitykitti_shufflenet_3"
 out_dir:  "fcn8s_2streamcitykitti_shufflenet_sq"
 

@@ -80,7 +80,7 @@ class Agent:
         self.sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options, allow_soft_placement=True))
 
         # Create Model class and build it
-        if self.mode == 'test_opt':
+        if self.mode == 'test_opt' or self.mode=='inference_opt':
             x_in, flow_in = self.optimized_data_loader()
 
         # Create Model class and build it
@@ -216,7 +216,7 @@ class Agent:
                                                             dataset.output_shapes)
             self.iterator2 = tf.contrib.data.Iterator.from_structure(dataset2.output_types,
                                                             dataset2.output_shapes)
- 
+
             self.next_batch = self.iterator.get_next()
             self.next_batch_flow = self.iterator2.get_next()
 

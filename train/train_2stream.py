@@ -986,7 +986,7 @@ class Train2Stream(Basic2StreamTrain):
                 # run the feed_forward
                 _ = self.sess.run(self.test_model.out_argmax)
                 # update the FPS meter
-                fps_meter.update_n(time.time() - start, self.args.batch_size)
+                fps_meter.update(time.time() - start, self.args.batch_size)
 
             except Exception as e:
                 print("FINISHED..")
@@ -994,7 +994,7 @@ class Train2Stream(Basic2StreamTrain):
                 break
 
         fps_meter.print_statistics()
- 
+
     def test_optimized(self, pkl=False):
         print("Testing mode will begin NOW..")
 
