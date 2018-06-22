@@ -1,7 +1,7 @@
-Geometric Deep Network for incorporating geometric cues within the network
+# Real-time Segmentation using Appearance, Motion and Geometry
 
 Aerial VIVID Experiments
-KITTI MoSeg Experiments
+KITTI Motion Experiments
 
 # Dependencies
 Python 3.5.2  
