@@ -1,5 +1,5 @@
 # Real-time Segmentation using Appearance, Motion and Geometry
-The repo contains the official implementation of real-time motion segmentation with geometric priors used in our paper:
+The repo contains the official implementation of real-time motion segmentation with geometric priors used in our IROS'18 paper:
 
 Coming Soon ...
 
