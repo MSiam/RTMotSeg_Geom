@@ -15,5 +15,5 @@ KITTI Motion Experiments
 
 # Demo
 
-[Video Demo](https://www.youtube.com/watch?v=Bq5twvBRGVI)
+[Video Demo](https://youtu.be/6PrmmkeFdS8)
 
