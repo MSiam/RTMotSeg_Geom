@@ -51,5 +51,5 @@ python3 main.py --load_config=fcn8s_2stream_shufflenet_train.yaml train Train2St
 
 # Demo
 
-[Video Demo](https://youtu.be/6PrmmkeFdS8)
+[Video Demo](https://youtu.be/_mWQe_hdo6I)
 
