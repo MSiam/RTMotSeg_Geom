@@ -1,17 +1,17 @@
 # Directories arguments
-data_dir: "vivid_2stream_darpa"
-exp_dir:  "fcn8s_2stream_mobilenet"
-out_dir:  "fcn8s_2stream_mobilenet"
+data_dir: "citykitti_2stream_sms"
+exp_dir:  "fcn8s_2streamcitykitti_mobilenet"
+out_dir:  "fcn8s_2streamcitykitti_mobilenet"
 
 # Data arguments
-img_height:   480
-img_width:    640
+img_height:   384
+img_width:    1248
 num_channels: 3
 num_classes:  2
 
 # Train arguments
 num_epochs: 200
-batch_size: 8
+batch_size: 4
 shuffle: True
 data_mode: "experiment"
 save_every: 10

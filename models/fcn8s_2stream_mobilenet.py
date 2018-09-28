@@ -1,7 +1,8 @@
 from models.basic.basic_model import BasicModel
 from models.encoders.mobilenet import MobileNet
-from layers.convolution import conv2d_transpose, conv2d, atrous_conv2d
+from layers.convolution import conv2d_transpose, conv2d, atrous_conv2d, depthwise_separable_conv2d
 from utils.img_utils import decode_labels
+from utils.misc import _debug
 
 import tensorflow as tf
 import numpy as np
@@ -80,47 +81,102 @@ class FCN8s2StreamMobileNet(BasicModel):
         # Build Encoding part
         self.app_encoder.build()
         self.motion_encoder.build()
-        self.combined_score= tf.multiply(self.app_encoder.score_fr, self.motion_encoder.score_fr)
+        self.feed2= tf.multiply(self.app_encoder.conv3_2, self.motion_encoder.conv3_2)
+        self.width_multiplier= 1.0
+        self.conv4_1 = depthwise_separable_conv2d('conv_ds_6_1', self.feed2, width_multiplier=self.width_multiplier,
+                                                  num_filters=256, kernel_size=(3, 3), padding='SAME',
+                                                  stride=(1, 1), activation=tf.nn.relu6,
+                                                  batchnorm_enabled=True, is_training=self.is_training,
+                                                  l2_strength=self.args.weight_decay)
+        _debug(self.conv4_1)
+        self.conv4_2 = depthwise_separable_conv2d('conv_ds_7_1', self.conv4_1, width_multiplier=self.width_multiplier,
+                                                  num_filters=512, kernel_size=(3, 3), padding='SAME',
+                                                  stride=(2, 2), activation=tf.nn.relu6,
+                                                  batchnorm_enabled=True, is_training=self.is_training,
+                                                  l2_strength=self.args.weight_decay)
+        _debug(self.conv4_2)
+        self.conv5_1 = depthwise_separable_conv2d('conv_ds_8_1', self.conv4_2, width_multiplier=self.width_multiplier,
+                                                      num_filters=512, kernel_size=(3, 3), padding='SAME',
+                                                      stride=(1, 1), activation=tf.nn.relu6,
+                                                      batchnorm_enabled=True, is_training=self.is_training,
+                                                      l2_strength=self.args.weight_decay)
+        _debug(self.conv5_1)
+        self.conv5_2 = depthwise_separable_conv2d('conv_ds_9_1', self.conv5_1, width_multiplier=self.width_multiplier,
+                                                  num_filters=512, kernel_size=(3, 3), padding='SAME',
+                                                  stride=(1, 1), activation=tf.nn.relu6,
+                                                  batchnorm_enabled=True, is_training=self.is_training,
+                                                  l2_strength=self.args.weight_decay)
+        _debug(self.conv5_2)
+        self.conv5_3 = depthwise_separable_conv2d('conv_ds_10_1', self.conv5_2,
+                                                  width_multiplier=self.width_multiplier,
+                                                  num_filters=512, kernel_size=(3, 3), padding='SAME',
+                                                  stride=(1, 1), activation=tf.nn.relu6,
+                                                  batchnorm_enabled=True, is_training=self.is_training,
+                                                  l2_strength=self.args.weight_decay)
+        _debug(self.conv5_3)
+        self.conv5_4 = depthwise_separable_conv2d('conv_ds_11_1', self.conv5_3,
+                                                  width_multiplier=self.width_multiplier,
+                                                  num_filters=512, kernel_size=(3, 3), padding='SAME',
+                                                  stride=(1, 1), activation=tf.nn.relu6,
+                                                  batchnorm_enabled=True, is_training=self.is_training,
+                                                  l2_strength=self.args.weight_decay)
+        _debug(self.conv5_4)
+        self.conv5_5 = depthwise_separable_conv2d('conv_ds_12_1', self.conv5_4,
+                                                  width_multiplier=self.width_multiplier,
+                                                  num_filters=512, kernel_size=(3, 3), padding='SAME',
+                                                  stride=(1, 1), activation=tf.nn.relu6,
+                                                  batchnorm_enabled=True, is_training=self.is_training,
+                                                  l2_strength=self.args.weight_decay)
+        _debug(self.conv5_5)
+        self.conv5_6 = depthwise_separable_conv2d('conv_ds_13_1', self.conv5_5,
+                                                  width_multiplier=self.width_multiplier,
+                                                  num_filters=1024, kernel_size=(3, 3), padding='SAME',
+                                                  stride=(2, 2), activation=tf.nn.relu6,
+                                                  batchnorm_enabled=True, is_training=self.is_training,
+                                                  l2_strength=self.args.weight_decay)
+        _debug(self.conv5_6)
+        self.conv6_1 = depthwise_separable_conv2d('conv_ds_14_1', self.conv5_6,
+                                                  width_multiplier=self.width_multiplier,
+                                                  num_filters=1024, kernel_size=(3, 3), padding='SAME',
+                                                  stride=(1, 1), activation=tf.nn.relu6,
+                                                  batchnorm_enabled=True, is_training=self.is_training,
+                                                  l2_strength=self.args.weight_decay)
+        _debug(self.conv6_1)
+        # Pooling is removed.
+        self.score_fr = conv2d('conv_1c_1x1_1', self.conv6_1, num_filters=self.params.num_classes, l2_strength=self.args.weight_decay,
+                               kernel_size=(1, 1))
+
+        self.feed1= self.conv4_2
 
         # Build Decoding part
         with tf.name_scope('upscore_2s'):
-            self.upscore2 = conv2d_transpose('upscore2', x=self.combined_score,
-                                             output_shape=self.app_encoder.feed1.shape.as_list()[0:3] + [
-                                                 self.params.num_classes], batchnorm_enabled=self.args.batchnorm_enabled,
-                                             kernel_size=(4, 4), stride=(2, 2), l2_strength=self.app_encoder.wd, bias=self.args.bias)
+            self.upscore2 = conv2d_transpose('upscore2', x=self.score_fr,
+                                             output_shape=self.feed1.shape.as_list()[0:3] + [
+                                                 self.params.num_classes], batchnorm_enabled=self.args.batchnorm_enabled, is_training= self.is_training,
+                                             kernel_size=(4, 4), stride=(2, 2), l2_strength=self.args.weight_decay, bias=self.args.bias)
+            _debug(self.upscore2)
 
-            self.app_score_feed1 = conv2d('app_score_feed1', x=self.app_encoder.feed1, batchnorm_enabled=self.args.batchnorm_enabled,
+            self.score_feed1 = conv2d('score_feed1', x=self.feed1, batchnorm_enabled=self.args.batchnorm_enabled, is_training= self.is_training,
                                       num_filters=self.params.num_classes, kernel_size=(1, 1), bias= self.args.bias,
-                                      l2_strength=self.app_encoder.wd)
-            self.app_score_feed1 = tf.nn.relu(self.app_score_feed1)
-            self.mot_score_feed1 = conv2d('mot_score_feed1', x=self.motion_encoder.feed1, batchnorm_enabled=self.args.batchnorm_enabled,
-                                      num_filters=self.params.num_classes, kernel_size=(1, 1), bias= self.args.bias,
-                                      l2_strength=self.motion_encoder.wd)
-            self.mot_score_feed1 = tf.nn.relu(self.mot_score_feed1)
-            self.score_feed1= tf.multiply(self.app_score_feed1, self.mot_score_feed1)
+                                      l2_strength=self.args.weight_decay)
+            _debug(self.score_feed1)
             self.fuse_feed1 = tf.add(self.score_feed1, self.upscore2)
 
         with tf.name_scope('upscore_4s'):
             self.upscore4 = conv2d_transpose('upscore4', x=self.fuse_feed1,
-                                             output_shape=self.app_encoder.feed2.shape.as_list()[0:3] + [
-                                                 self.params.num_classes], batchnorm_enabled=self.args.batchnorm_enabled,
-                                             kernel_size=(4, 4), stride=(2, 2), l2_strength=self.app_encoder.wd, bias=self.args.bias)
-
-            self.app_score_feed2 = conv2d('app_score_feed2', x=self.app_encoder.feed2, batchnorm_enabled=self.args.batchnorm_enabled,
+                                             output_shape=self.feed2.shape.as_list()[0:3] + [
+                                                 self.params.num_classes], batchnorm_enabled=self.args.batchnorm_enabled, is_training= self.is_training,
+                                             kernel_size=(4, 4), stride=(2, 2), l2_strength=self.args.weight_decay, bias=self.args.bias)
+            _debug(self.upscore4)
+            self.score_feed2 = conv2d('score_feed2', x=self.feed2, batchnorm_enabled=self.args.batchnorm_enabled, is_training= self.is_training,
                                       num_filters=self.params.num_classes, kernel_size=(1, 1), bias=self.args.bias,
-                                      l2_strength=self.app_encoder.wd)
-            self.app_score_feed2 = tf.nn.relu(self.app_score_feed2)
-            self.mot_score_feed2 = conv2d('mot_score_feed2', x=self.motion_encoder.feed2, batchnorm_enabled=self.args.batchnorm_enabled,
-                                      num_filters=self.params.num_classes, kernel_size=(1, 1), bias=self.args.bias,
-                                      l2_strength=self.motion_encoder.wd)
-            self.mot_score_feed2 = tf.nn.relu(self.mot_score_feed2)
-            self.score_feed2= tf.multiply(self.app_score_feed2, self.mot_score_feed2)
-
+                                      l2_strength=self.args.weight_decay)
+            _debug(self.score_feed2)
             self.fuse_feed2 = tf.add(self.score_feed2, self.upscore4)
 
         with tf.name_scope('upscore_8s'):
             self.upscore8 = conv2d_transpose('upscore8', x=self.fuse_feed2,
-                                             output_shape=self.x_pl.shape.as_list()[0:3] + [self.params.num_classes],
-                                             kernel_size=(16, 16), stride=(8, 8), l2_strength=self.app_encoder.wd, bias=self.args.bias)
-
+                                             output_shape=self.x_pl.shape.as_list()[0:3] + [self.params.num_classes], is_training= self.is_training,
+                                             kernel_size=(16, 16), stride=(8, 8), l2_strength=self.args.weight_decay, bias=self.args.bias)
+            _debug(self.upscore8)
         self.logits = self.upscore8

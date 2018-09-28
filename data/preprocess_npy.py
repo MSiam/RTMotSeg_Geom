@@ -8,7 +8,9 @@ import pdb
 from random import shuffle
 import h5py
 
-SIZE= (480, 640)
+#SIZE= (384, 1248)
+SIZE= (384, 1248)
+#SIZE= (512, 1024)
 
 def write_image_flow_annotation_pairs(filename_pairs, path, split):
     counter = 0
@@ -26,10 +28,9 @@ def write_image_flow_annotation_pairs(filename_pairs, path, split):
         img = misc.imread(img_path)
         img = misc.imresize(img, SIZE)
         imgs.append(img)
-        annotation = misc.imread(annotation_path)
-        annotation[annotation<=128]=0
-        annotation[annotation>128]=1
+        annotation = misc.imread(annotation_path, 'P')
         annotation = misc.imresize(annotation, SIZE, 'nearest')
+        annotation[annotation>0] = 1.0
         labels.append(annotation)
 
     np.save(path+'/X_'+split+'.npy', imgs)
@@ -101,7 +102,8 @@ def parse_paths(args_):
         else:
             filename_pairs.append((args_.root+tkns[0], args_.root+tkns[1]))
 
-    shuffle(filename_pairs)
+    if args_.pathfile.split('_')[0] == 'train':
+        shuffle(filename_pairs)
 
     if not flow_flag:
         write_image_annotation_pairs(filename_pairs, args_.out, args_.pathfile.split('_')[0])
