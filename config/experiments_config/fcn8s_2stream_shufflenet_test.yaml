@@ -1,15 +1,16 @@
 # Directories arguments
 #data_dir: "citykitti_2stream_sms"
-data_dir: "kitti_2stream_sq_4"
-exp_dir:  "fcn8s_2streamcitykitti_shufflenet_earlyfusion"
-out_dir:  "fcn8s_2streamcitykitti_shufflenet_sq_4"
+data_dir: "vivid_2streamwarp_darpa"
+#data_dir: "kitti_2stream_sq_4"
+exp_dir:  "fcn8s_2streamwarp_shufflenet"
+out_dir:  "fcn8s_shufflenet_2"
 #data_dir: "vivid_2streamwarp_darpa"
 #exp_dir:  "fcn8s_2streamwarp_shufflenet"
 #out_dir:  "fcn8s_2streamwarp_shufflenet"
 
 # Data arguments
-img_height:   384
-img_width:    768 #1248
+img_height:   480 #384
+img_width:    640 #768 #1248
 num_channels: 3
 num_classes:  2
 
@@ -31,7 +32,7 @@ num_groups: 3
 learning_rate:   0.0001
 weight_decay: 5e-4
 bias: 0.0
-pretrained_path: "pretrained_weights/shufflenet_weights.pkl"
+pretrained_path: "pretrained_weights/shufflenet_cityscapes.pkl"
 
 # Misc arguments
 verbose: False

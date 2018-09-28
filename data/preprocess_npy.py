@@ -28,33 +28,24 @@ def write_image_flow_annotation_pairs(filename_pairs, path, split):
         img = misc.imread(img_path)
         img = misc.imresize(img, SIZE)
         imgs.append(img)
-        annotation = misc.imread(annotation_path)
-#        annotation[annotation==1]=0
-#        annotation[annotation==3]=0
-#        annotation[annotation==2]=1
-        annotation[annotation<128]=0
-        annotation[annotation>=128]=1
-#        annotation[annotation<=150]=0
-#        annotation[annotation==255]=0
-#        annotation[annotation>150]=1
-#        import matplotlib.pyplot as plt
-#        plt.imshow(annotation); plt.show()
+        annotation = misc.imread(annotation_path, 'P')
         annotation = misc.imresize(annotation, SIZE, 'nearest')
+        annotation[annotation>0] = 1.0
         labels.append(annotation)
 
-    np.save(path+'/X_'+split+'.npy', imgs)
+#    np.save(path+'/X_'+split+'.npy', imgs)
     np.save(path+'/Flo_'+split+'.npy', flows)
-    np.save(path+'/Y_'+split+'.npy', labels)
+#    np.save(path+'/Y_'+split+'.npy', labels)
 
-    if split=='train':
-        mean= np.mean(np.asarray(imgs), axis=0)
-        np.save(path+'/mean.npy', mean)
-
-        flo_mean= np.mean(np.asarray(flows), axis=0)
-        np.save(path+'/flo_mean.npy', flo_mean)
-
-        weights= get_weights(2, labels)
-        np.save(path+'/weights.npy', weights)
+#    if split=='train':
+#        mean= np.mean(np.asarray(imgs), axis=0)
+#        np.save(path+'/mean.npy', mean)
+#
+#        flo_mean= np.mean(np.asarray(flows), axis=0)
+#        np.save(path+'/flo_mean.npy', flo_mean)
+#
+#        weights= get_weights(2, labels)
+#        np.save(path+'/weights.npy', weights)
 
 def write_image_annotation_pairs(filename_pairs, path, split):
     counter = 0
@@ -72,12 +63,12 @@ def write_image_annotation_pairs(filename_pairs, path, split):
 
     np.save(path+'/X_'+split+'.npy', imgs)
     np.save(path+'/Y_'+split+'.npy', labels)
-    if split=='train':
-        mean= np.mean(np.asarray(imgs), axis=0)
-        np.save(path+'/mean.npy', mean)
-
-        weights= get_weights(2, labels)
-        np.save(path+'/weights.npy', weights)
+#    if split=='train':
+#        mean= np.mean(np.asarray(imgs), axis=0)
+#        np.save(path+'/mean.npy', mean)
+#
+#        weights= get_weights(2, labels)
+#        np.save(path+'/weights.npy', weights)
 
 def get_weights(nclasses, yy):
     label_to_frequency= {}
