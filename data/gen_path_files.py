@@ -12,8 +12,8 @@ def main(main_path, split, out_path):
     short_img_dir= 'images4/'+split+'/'
     label_dir= main_path+'mask_post/'+split+'/'
     short_label_dir= 'mask_post/'+split+'/'
-    flow_dir= main_path+'flownet_2_flow/'+split+'/'
-    short_flow_dir= 'flownet_2_flow/'+split+'/'
+    flow_dir= main_path+'flow/'+split+'/'
+    short_flow_dir= 'flow/'+split+'/'
 
     imgs_folders= sorted(os.listdir(img_dir))
     labels_folders= sorted(os.listdir(label_dir))
