@@ -345,6 +345,7 @@ class Train2Stream(Basic2StreamTrain):
         self.test_data = {'X': np.load(self.args.data_dir + "X_vid.npy")}
         self.test_data['Y'] = np.zeros(self.test_data['X'].shape[:3])
         self.test_data_len = self.test_data['X'].shape[0]
+
         print("Vid-shape-x -- " + str(self.test_data['X'].shape))
         print("Vid-shape-y -- " + str(self.test_data['Y'].shape))
         self.num_iterations_testing_per_epoch = (self.test_data_len + self.args.batch_size - 1) // self.args.batch_size
@@ -372,6 +373,9 @@ class Train2Stream(Basic2StreamTrain):
                           'Y': np.load(self.args.data_dir + "Y_val.npy")}
         self.test_data= self.resize(self.test_data)
         self.test_data_len = self.test_data['X'].shape[0] - self.test_data['X'].shape[0] % self.args.batch_size
+        self.test_data['X'] = self.test_data['X'].transpose(0,3,1,2)
+        self.test_data['Flo'] = self.test_data['Flo'].transpose(0,3,1,2)
+
         print("Test-shape-x -- " + str(self.test_data['X'].shape))
         print("Test-shape-y -- " + str(self.test_data['Y'].shape))
         self.num_iterations_testing_per_epoch = (self.test_data_len + self.args.batch_size - 1) // self.args.batch_size
