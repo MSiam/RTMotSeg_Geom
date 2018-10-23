@@ -42,7 +42,7 @@ class FCN8sShuffleNet(BasicModel):
 
         # Build Encoding part
         self.encoder.build()
-
+        import pdb; pdb.set_trace()
         # Build Decoding part
         with tf.name_scope('upscore_2s'):
             self.upscore2 = conv2d_transpose('upscore2', x=self.encoder.score_fr,

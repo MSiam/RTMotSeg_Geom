@@ -1,17 +1,17 @@
 # Directories arguments
-data_dir: "citykitti_2stream_sms"
-exp_dir:  "fcn8s_2streamcitykitti_shufflenet"
-out_dir:  "fcn8s_2streamcitykitti_shufflenet"
+data_dir: "vivid_2streamwarp_darpa"
+exp_dir:  "fcn8s_2stream_vivid_shufflenet_nchw"
+out_dir:  "fcn8s_2stream_vivid_shufflenet_nchw"
 
 # Data arguments
-img_height:   384
-img_width:    1248
+img_height:   480
+img_width:    640
 num_channels: 3
 num_classes:  2
 
 # Train arguments
 num_epochs: 200
-batch_size: 8
+batch_size: 4
 shuffle: True
 data_mode: "experiment"
 save_every: 5

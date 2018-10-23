@@ -11,8 +11,8 @@ def max_pool_2d(x, size=(2, 2), stride=(2, 2), name='pooling'):
     """
     size_x, size_y = size
     stride_x, stride_y = stride
-    return tf.nn.max_pool(x, ksize=[1, size_x, size_y, 1], strides=[1, stride_x, stride_y, 1], padding='VALID',
-                          name=name)
+    return tf.nn.max_pool(x, ksize=[1, 1, size_x, size_y], strides=[1, 1, stride_x, stride_y], padding='VALID',
+                          name=name, data_format="NCHW")
 
 
 def avg_pool_2d(x, size=(2, 2), stride=(2, 2), name='avg_pooling', padding='VALID'):
@@ -25,7 +25,9 @@ def avg_pool_2d(x, size=(2, 2), stride=(2, 2), name='avg_pooling', padding='VALI
     """
     size_x, size_y = size
     stride_x, stride_y = stride
-    return tf.nn.avg_pool(x, ksize=[1, size_x, size_y, 1], strides=[1, stride_x, stride_y, 1], padding=padding, name=name)
+    return tf.nn.avg_pool(x, ksize=[1, 1, size_x, size_y], strides=[1, 1, stride_x, stride_y], padding=padding,
+                          name=name, data_format="NCHW")
+
 
 def upsample_2d(x, size=(2, 2), name='upsampling'):
     """

@@ -118,7 +118,7 @@ class BasicModel:
     def init_output(self):
         with tf.name_scope('output'):
             self.out_softmax = tf.nn.softmax(self.logits)
-            self.out_argmax = tf.argmax(self.out_softmax, axis=3, output_type=tf.int32)
+            self.out_argmax = tf.argmax(self.out_softmax, axis=1, output_type=tf.int32)
 
     def get_class_weighting(self):
         self.wghts= tf.one_hot(self.y_pl, dtype='float32', depth=self.params.num_classes)* \
@@ -127,6 +127,7 @@ class BasicModel:
 
     def weighted_loss(self):
         self.get_class_weighting()
+        self.logits = tf.transpose(self.logits, (0, 2, 3, 1))
         losses= tf.losses.sparse_softmax_cross_entropy(logits= self.logits, labels=self.y_pl, weights= self.wghts)
         return tf.reduce_mean(losses)
 
@@ -168,6 +169,9 @@ class BasicModel:
         with tf.name_scope('segmented_output'):
             input_summary = tf.cast(self.x_pl, tf.uint8)
             # labels_summary = tf.py_func(decode_labels, [self.y_pl, self.params.num_classes], tf.uint8)
+            shp = [ int(s) for s in input_summary.shape]
+            preds_summary = tf.reshape(preds_summary, (shp[0], shp[2], shp[3], shp[1]))
+            preds_summary = tf.transpose(preds_summary, (0, 3, 1, 2))
             preds_summary = tf.py_func(decode_labels, [self.out_argmax, self.params.num_classes], tf.uint8)
             self.segmented_summary = tf.concat(axis=2, values=[input_summary,
                                                                preds_summary])  # Concatenate row-wise

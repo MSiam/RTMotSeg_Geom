@@ -25,8 +25,8 @@ import matplotlib.pyplot as plt
 #import cv2
 
 from utils.img_utils import decode_labels
-from utils.seg_dataloader import SegDataLoader
-from tensorflow.contrib.data import Iterator
+#from utils.seg_dataloader import SegDataLoader
+#from tensorflow.contrib.data import Iterator
 import pdb
 import torchfile
 
@@ -283,6 +283,8 @@ class Train2Stream(Basic2StreamTrain):
             for y in range(self.train_data['Y'].shape[0]):
                 yy[y,...]= misc.imresize(self.train_data['Y'][y,...], out_shape, interp='nearest')
             self.train_data['Y']=yy
+        self.train_data['X'] = self.train_data['X'].transpose(0,3,1,2)
+        self.train_data['Flo'] = self.train_data['Flo'].transpose(0,3,1,2)
         self.train_data_len = self.train_data['X'].shape[0]
 
         self.num_iterations_training_per_epoch = (self.train_data_len + self.args.batch_size - 1) // self.args.batch_size
@@ -307,6 +309,8 @@ class Train2Stream(Basic2StreamTrain):
 
         self.val_data_len = self.val_data['X'].shape[0] - self.val_data['X'].shape[0] % self.args.batch_size
         self.num_iterations_validation_per_epoch = (self.val_data_len + self.args.batch_size - 1) // self.args.batch_size
+        self.val_data['X'] = self.val_data['X'].transpose(0,3,1,2)
+        self.val_data['Flo'] = self.val_data['Flo'].transpose(0,3,1,2)
         print("Val-shape-x -- " + str(self.val_data['X'].shape) + " " + str(self.val_data_len))
         print("Val-shape-y -- " + str(self.val_data['Y'].shape))
         print("Num of iterations on validation data in one epoch -- " + str(self.num_iterations_validation_per_epoch))
@@ -478,8 +482,8 @@ class Train2Stream(Basic2StreamTrain):
                 if cur_iteration < self.num_iterations_training_per_epoch - 1:
 
                     # run the feed_forward
-                    _, loss, acc, summaries_merged = self.sess.run(
-                        [self.model.train_op, self.model.loss, self.model.accuracy, self.model.merged_summaries],
+                    _, loss, acc = self.sess.run(
+                        [self.model.train_op, self.model.loss, self.model.accuracy],
                         feed_dict=feed_dict)
                     # log loss and acc
                     loss_list += [loss]
@@ -489,26 +493,14 @@ class Train2Stream(Basic2StreamTrain):
 
                 else:
                     # run the feed_forward
-                    _, loss, acc, summaries_merged, segmented_imgs = self.sess.run(
-                        [self.model.train_op, self.model.loss, self.model.accuracy,
-                         self.model.merged_summaries, self.model.segmented_summary],
+                    _, loss, acc = self.sess.run(
+                        [self.model.train_op, self.model.loss, self.model.accuracy],
                         feed_dict=feed_dict)
                     # log loss and acc
                     loss_list += [loss]
                     acc_list += [acc]
                     total_loss = np.mean(loss_list)
                     total_acc = np.mean(acc_list)
-                    # summarize
-                    summaries_dict = dict()
-                    summaries_dict['train-loss-per-epoch'] = total_loss
-                    summaries_dict['train-acc-per-epoch'] = total_acc
-                    summaries_dict['train_prediction_sample'] = segmented_imgs
-#                    self.add_summary(cur_it, summaries_dict=summaries_dict, summaries_merged=summaries_merged)
-
-                    # report
-                    self.reporter.report_experiment_statistics('train-acc', 'epoch-' + str(cur_epoch), str(total_acc))
-                    self.reporter.report_experiment_statistics('train-loss', 'epoch-' + str(cur_epoch), str(total_loss))
-                    self.reporter.finalize()
 
                     # Update the Global step
                     self.model.global_step_assign_op.eval(session=self.sess,
