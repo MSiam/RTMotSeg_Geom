@@ -39,6 +39,8 @@ python3 main.py --load_config=fcn8s_2stream_shufflenet_train.yaml train Train2St
 
 [UAV Imagery VIVID Homography Compensated Flow](https://drive.google.com/file/d/17NZjIUz5tPhSIOh5Yp-9dKM7UzubWXWJ/view?usp=sharing)
 
+The labels used for KITTI Motion is used from the work on [Deep Motion](http://deepmotion.cs.uni-freiburg.de/)
+
 [KITTI Motion Test](https://drive.google.com/open?id=1NqMN3iEC1G3JtiBGE8YGon_0S0EDkoOz)
 
 # Weights
