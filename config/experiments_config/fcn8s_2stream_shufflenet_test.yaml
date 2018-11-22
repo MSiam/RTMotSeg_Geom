@@ -1,5 +1,5 @@
 # Directories arguments
-data_dir: "vivid_2streamwarp_darpa"
+data_dir: "citykitti_2stream_sms_test"
 exp_dir:  "fcn8s_2stream_vivid_shufflenet_nchw"
 out_dir:  "fcn8s_2stream_vivid_shufflenet_nchw"
 

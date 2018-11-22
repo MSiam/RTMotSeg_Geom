@@ -755,7 +755,7 @@ class Train2Stream(Basic2StreamTrain):
         self.load_best_model()
 
         # init tqdm and get the epoch value
-        tt = tqdm(range(self.test_data_len))
+        tt = tqdm(range(1000))#self.test_data_len))
 
         # idx of image
         idx = 0
@@ -771,7 +771,7 @@ class Train2Stream(Basic2StreamTrain):
             y_batch = self.test_data['Y'][idx:idx + 1]
 
             # update idx of mini_batch
-            idx += 1
+#            idx += 1
 
             # Feed this variables to the network
             if self.args.random_cropping:
