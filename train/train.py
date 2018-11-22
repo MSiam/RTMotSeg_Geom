@@ -25,7 +25,7 @@ import matplotlib.pyplot as plt
 
 from utils.img_utils import decode_labels
 from utils.seg_dataloader import SegDataLoader
-from tensorflow.contrib.data import Iterator
+from tensorflow.data import Iterator
 import pdb
 import torchfile
 
