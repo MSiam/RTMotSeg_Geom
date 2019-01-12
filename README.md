@@ -1,8 +1,16 @@
 # Real-time Segmentation using Appearance, Motion and Geometry
 
 The repo contains the official implementation of real-time motion segmentation with geometric priors used in our IROS'18 paper:
-
-Coming Soon ...
+```
+@inproceedings{siam2018real,
+  title={Real-Time Segmentation with Appearance, Motion and Geometry},
+  author={Siam, Mennatullah and Eikerdawy, Sara and Gamal, Mostafa and Abdel-Razek, Moemen and Jagersand, Martin and Zhang, Hong},
+  booktitle={2018 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)},
+  pages={5793--5800},
+  year={2018},
+  organization={IEEE}
+}
+```
 
 # Description
 
